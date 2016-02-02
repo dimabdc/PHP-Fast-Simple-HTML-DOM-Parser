@@ -22,7 +22,7 @@ use FastSimpleHTMLDom\Document;
 $html = new Document(file_get_contents('https://habrahabr.ru/interesting/'));
 
 // Find all post blocks
-$articles = [];
+$post = [];
 foreach($html->find('div.post') as $post) {
     $item['title']   = $post->find('h1.title', 0)->plaintext;
     $item['hubs']    = $post->find('div.hubs', 0)->plaintext;
