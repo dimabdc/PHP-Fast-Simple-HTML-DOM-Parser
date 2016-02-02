@@ -4,6 +4,7 @@ namespace FastSimpleHTMLDom;
 
 
 use DOMNode;
+use Traversable;
 
 /**
  * Class Element
@@ -12,7 +13,7 @@ use DOMNode;
  * @property string innertext Get dom node's inner html
  * @property string plaintext Get dom node's plain text
  */
-class Element
+class Element implements \IteratorAggregate
 {
     protected $node;
 
@@ -42,10 +43,11 @@ class Element
      *
      * @param string $selector
      * @param int $idx
+     * @return NodeList|Element|null
      */
     public function find($selector, $idx = null)
     {
-        $this->getDom()->find($selector, $idx);
+        return $this->getDom()->find($selector, $idx);
     }
 
     /**
@@ -110,4 +112,22 @@ class Element
         }
     }
 
+    /**
+     * Retrieve an external iterator
+     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * <b>Traversable</b>
+     * @since 5.0.0
+     */
+    public function getIterator()
+    {
+        if ($this->node->hasChildNodes()) {
+            $elements = new NodeList();
+            foreach ($this->node->childNodes as $node) {
+                $elements[] = new Element($node);
+            }
+            return $elements;
+        }
+        return null;
+    }
 }

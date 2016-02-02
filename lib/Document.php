@@ -122,10 +122,14 @@ class Document
         if ($count === 0) return array();
 
         if (is_null($idx)) {
+            if ($count === 1) {
+                return $elements[0];
+            }
             return $elements;
         } else if ($idx < 0) {
             $idx = count($elements) + $idx;
         }
+
         return (isset($elements[$idx])) ? $elements[$idx] : null;
     }
 
@@ -170,7 +174,7 @@ class Document
      */
     public function outertext()
     {
-        return $this->innerHtml();
+        return $this->html();
     }
 
     /**
@@ -180,7 +184,7 @@ class Document
      */
     public function innertext()
     {
-        return $this->html();
+        return $this->innerHtml();
     }
 
     /**
