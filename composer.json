@@ -1,0 +1,23 @@
+{
+    "name": "dimabdc/fast-simple_html_dom",
+    "description": "PHP Fast Simple HTML DOM parser.",
+    "type": "library",
+    "keywords": ["html","parse","parser"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "dimabdc",
+            "email": "support@titor.ru",
+            "homepage": "http://github.com/dimabdc"
+        }
+    ],
+	"require":{
+        "php":">=5.5.9",
+        "symfony/css-selector": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "FastSimpleHTMLDom\\": "lib/"
+        }
+    }
+}
