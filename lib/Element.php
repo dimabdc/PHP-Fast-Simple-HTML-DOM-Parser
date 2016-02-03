@@ -51,6 +51,208 @@ class Element implements \IteratorAggregate
     }
 
     /**
+     * Return Element by id
+     *
+     * @param $id
+     * @return Element|null
+     */
+    public function getElementById($id)
+    {
+        return $this->find("#$id", 0);
+    }
+
+    /**
+     * Returns Elements by id
+     *
+     * @param $id
+     * @param null $idx
+     * @return Element|NodeList|null
+     */
+    public function getElementsById($id, $idx = null)
+    {
+        return $this->find("#$id", $idx);
+    }
+
+    /**
+     * Return Element by tag name
+     *
+     * @param $name
+     * @return Element|null
+     */
+    public function getElementByTagName($name)
+    {
+        return $this->find($name, 0);
+    }
+
+    /**
+     * Returns Elements by tag name
+     *
+     * @param $name
+     * @param null $idx
+     * @return Element|NodeList|null
+     */
+    public function getElementsByTagName($name, $idx = null)
+    {
+        return $this->find($name, $idx);
+    }
+
+    /**
+     * Returns children of node
+     *
+     * @param int $idx
+     * @return NodeList|Element|null
+     */
+    public function childNodes($idx = -1)
+    {
+        $nodeList = $this->getIterator();
+
+        if ($idx === -1) {
+            return $nodeList;
+        }
+
+        if (isset($nodeList[$idx])) {
+            return $nodeList[$idx];
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns children of node
+     *
+     * @param int $idx
+     * @return NodeList|Element|null
+     */
+    public function children($idx = -1)
+    {
+        return $this->childNodes($idx);
+    }
+
+    /**
+     * Returns the first child of node
+     *
+     * @return Element|null
+     */
+    public function firstChild()
+    {
+        $node = $this->node->firstChild;
+
+        if ($node === null) {
+            return null;
+        }
+
+        return new Element($node);
+    }
+
+    /**
+     * Returns the first child of node
+     *
+     * @return Element|null
+     */
+    public function first_child()
+    {
+        return $this->firstChild();
+    }
+
+    /**
+     * Returns the last child of node
+     *
+     * @return Element|null
+     */
+    public function lastChild()
+    {
+        $node = $this->node->lastChild;
+
+        if ($node === null) {
+            return null;
+        }
+
+        return new Element($node);
+    }
+
+    /**
+     * Returns the last child of node
+     *
+     * @return Element|null
+     */
+    public function last_child()
+    {
+        return $this->lastChild();
+    }
+
+    /**
+     * Returns the next sibling of node
+     *
+     * @return Element|null
+     */
+    public function nextSibling()
+    {
+        $node = $this->node->nextSibling;
+
+        if ($node === null) {
+            return null;
+        }
+
+        return new Element($node);
+    }
+
+    /**
+     * Returns the next sibling of node
+     *
+     * @return Element|null
+     */
+    public function next_sibling()
+    {
+        return $this->nextSibling();
+    }
+
+    /**
+     * Returns the previous sibling of node
+     *
+     * @return Element|null
+     */
+    public function previousSibling()
+    {
+        $node = $this->node->previousSibling;
+
+        if ($node === null) {
+            return null;
+        }
+
+        return new Element($node);
+    }
+
+    /**
+     * Returns the previous sibling of node
+     *
+     * @return Element|null
+     */
+    public function prev_sibling()
+    {
+        return $this->previousSibling();
+    }
+
+    /**
+     * Returns the parent of node
+     *
+     * @return Element
+     */
+    public function parentNode()
+    {
+        return new Element($this->node->parentNode);
+    }
+
+    /**
+     * Returns the parent of node
+     *
+     * @return Element
+     */
+    public function parent()
+    {
+        return $this->parentNode();
+    }
+
+    /**
      * Get dom node's outer html
      *
      * @return string
@@ -101,33 +303,93 @@ class Element implements \IteratorAggregate
     }
 
     /**
+     * Returns array of attributes
+     *
+     * @return array|null
+     */
+    public function getAllAttributes()
+    {
+        if ($this->node->hasAttributes()) {
+            $attributes = [];
+            foreach ($this->node->attributes as $attr) {
+                $attributes[$attr->name] = $attr->value;
+            }
+            return $attributes;
+        }
+        return null;
+    }
+
+    /**
+     * Return attribute value
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function getAttribute($name)
+    {
+        if ($this->node->hasAttributes()) {
+            return $this->node->attributes->getNamedItem($name)->value;
+        }
+        return null;
+    }
+
+    /**
+     * Determine if an attribute exists on the element.
+     *
      * @param $name
-     * @return string
+     * @return bool
+     */
+    public function hasAttribute($name)
+    {
+        if ($this->node->hasAttributes()) {
+            return $this->node->attributes->getNamedItem($name) ? true : false;
+        }
+        return false;
+    }
+
+    /**
+     * @param $name
+     * @return array|null|string
      */
     function __get($name) {
         switch ($name) {
             case 'outertext': return $this->outertext();
             case 'innertext': return $this->innertext();
             case 'plaintext': return $this->text();
+            case 'tag'      : return $this->node->nodeName;
+            case 'attr'     : return $this->getAllAttributes();
+            default         : return $this->getAttribute($name);
         }
     }
 
     /**
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name) {
+        switch ($name) {
+            case 'outertext': return true;
+            case 'innertext': return true;
+            case 'plaintext': return true;
+            case 'tag'      : return true;
+            default         : return $this->hasAttribute($name);
+        }
+    }
+    /**
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return NodeList An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      * @since 5.0.0
      */
     public function getIterator()
     {
+        $elements = new NodeList();
         if ($this->node->hasChildNodes()) {
-            $elements = new NodeList();
             foreach ($this->node->childNodes as $node) {
                 $elements[] = new Element($node);
             }
-            return $elements;
         }
-        return null;
+        return $elements;
     }
 }
