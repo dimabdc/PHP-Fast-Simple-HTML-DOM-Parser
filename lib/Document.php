@@ -122,9 +122,6 @@ class Document
         if ($count === 0) return array();
 
         if (is_null($idx)) {
-            if ($count === 1) {
-                return $elements[0];
-            }
             return $elements;
         } else if ($idx < 0) {
             $idx = count($elements) + $idx;
