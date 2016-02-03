@@ -8,7 +8,7 @@ PHP Fast Simple HTML DOM Parser - fast and low mamory usage HTML DOM Parser with
 
 ## Установка
 
-Для установки DiDOM выполните команду:
+Для установки выполните команду:
 
     composer require dimabdc/php-fast-simple-html-dom-parser
 
