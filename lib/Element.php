@@ -377,7 +377,12 @@ class Element implements \IteratorAggregate
      */
     public function setAttribute($name, $value)
     {
-        $this->node->setAttribute($name, $value);
+        if (empty($value)) {
+            $this->node->removeAttribute($name);
+        } else {
+            $this->node->setAttribute($name, $value);
+        }
+
         return $this;
     }
 
