@@ -99,6 +99,11 @@ class Document
         return $this;
     }
 
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
     /**
      * Find list of nodes with a CSS selector
      *

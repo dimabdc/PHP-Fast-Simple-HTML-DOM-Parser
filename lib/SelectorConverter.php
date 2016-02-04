@@ -14,6 +14,14 @@ class SelectorConverter
             return self::$compiled[$selector];
         }
 
+        if ($selector === 'text') {
+            return '//text()';
+        }
+
+        if ($selector === 'comment') {
+            return '//comment()';
+        }
+
         if (!class_exists('Symfony\\Component\\CssSelector\\CssSelectorConverter')) {
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector 2.8+ is not installed (you can use filterXPath instead).');
         }

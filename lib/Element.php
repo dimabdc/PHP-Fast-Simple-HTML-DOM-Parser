@@ -3,8 +3,8 @@
 namespace FastSimpleHTMLDom;
 
 
+use DOMElement;
 use DOMNode;
-use Traversable;
 
 /**
  * Class Element
@@ -15,6 +15,9 @@ use Traversable;
  */
 class Element implements \IteratorAggregate
 {
+    /**
+     * @var DOMElement
+     */
     protected $node;
 
     public function __construct(DOMNode $node)
@@ -28,6 +31,41 @@ class Element implements \IteratorAggregate
     public function getNode()
     {
         return $this->node;
+    }
+
+    /**
+     * Replace this node
+     *
+     * @param $string
+     * @return $this
+     */
+    protected function replaceNode($string)
+    {
+        $newDocument = new Document($string);
+        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
+
+        $this->node->parentNode->replaceChild($newNode, $this->node);
+
+        return $this;
+    }
+
+    /**
+     * Replace child node
+     *
+     * @param $string
+     * @return $this
+     */
+    protected function replaceChild($string)
+    {
+        $newDocument = new Document($string);
+        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
+
+        foreach ($this->node->childNodes as $node) {
+            $this->node->removeChild($node);
+        }
+        $this->node->appendChild($newNode);
+
+        return $this;
     }
 
     /**
@@ -327,10 +365,20 @@ class Element implements \IteratorAggregate
      */
     public function getAttribute($name)
     {
-        if ($this->node->hasAttributes()) {
-            return $this->node->attributes->getNamedItem($name)->value;
-        }
-        return null;
+        return $this->node->getAttribute($name);
+    }
+
+    /**
+     * Set attribute value
+     *
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->node->setAttribute($name, $value);
+        return $this;
     }
 
     /**
@@ -341,10 +389,7 @@ class Element implements \IteratorAggregate
      */
     public function hasAttribute($name)
     {
-        if ($this->node->hasAttributes()) {
-            return $this->node->attributes->getNamedItem($name) ? true : false;
-        }
-        return false;
+        return $this->node->hasAttribute($name);
     }
 
     /**
@@ -362,15 +407,23 @@ class Element implements \IteratorAggregate
         }
     }
 
+    function __set($name, $value) {
+        switch ($name) {
+            case 'outertext': return $this->replaceNode($value);
+            case 'innertext': return $this->replaceChild($value);
+            default         : return $this->setAttribute($name, $value);
+        }
+    }
+
     /**
      * @param $name
      * @return bool
      */
     public function __isset($name) {
         switch ($name) {
-            case 'outertext': return true;
-            case 'innertext': return true;
-            case 'plaintext': return true;
+            case 'outertext':
+            case 'innertext':
+            case 'plaintext':
             case 'tag'      : return true;
             default         : return $this->hasAttribute($name);
         }
