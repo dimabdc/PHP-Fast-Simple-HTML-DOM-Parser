@@ -54,7 +54,7 @@ $html = new Document(file_get_contents('https://habrahabr.ru/interesting/'));
 
 ## Как искать HTML DOM элементы?
 
-### Базовое
+### Основа
 
 ```php    
 
@@ -74,7 +74,7 @@ $ret = $html->find('div[id]');
 $ret = $html->find('div[id=foo]'); 
 ```
 
-### Продвинутое
+### Часто используемое
 
 ```php    
 
@@ -128,4 +128,188 @@ foreach($html->find('ul') as $ul)
 $e = $html->find('ul', 0)->find('li', 0);
 ```
 
+### Фильтр атрибутов
 
+Filter	|Description
+---|---
+[attribute]	|Matches elements that have the specified attribute.
+[!attribute]	|Matches elements that don't have the specified attribute.
+[attribute=value]	|Matches elements that have the specified attribute with a certain value.
+[attribute!=value]	|Matches elements that don't have the specified attribute with a certain value.
+[attribute^=value]	|Matches elements that have the specified attribute and it starts with a certain value.
+[attribute$=value]	|Matches elements that have the specified attribute and it ends with a certain value.
+[attribute*=value]	|Matches elements that have the specified attribute and it contains a certain value.
+
+### Текст, комментарии (не реализовано)
+
+```php    
+
+// Find all text blocks 
+$es = $html->find('text');
+
+// Find all comment (<!--...-->) blocks 
+$es = $html->find('comment');
+```
+
+## Доступ к атрибутам
+
+### Получение, установка и удаление атрибутов
+
+```php    
+
+// Get a attribute ( If the attribute is non-value attribute (eg. checked, selected...), it will returns true or false)
+$value = $e->href;
+
+// Не реализовано
+// Set a attribute(If the attribute is non-value attribute (eg. checked, selected...), set it's value as true or false)
+$e->href = 'my link';
+
+// Не реализовано
+// Remove a attribute, set it's value as null! 
+$e->href = null;
+
+// Determine whether a attribute exist? 
+if(isset($e->href)) 
+        echo 'href exist!';
+```
+
+### "Магические" атрибуты
+
+```php    
+
+// Example
+$html = str_get_html("<div>foo <b>bar</b></div>"); 
+$e = $html->find("div", 0);
+
+echo $e->tag; // Returns: " div"
+echo $e->outertext; // Returns: " <div>foo <b>bar</b></div>"
+echo $e->innertext; // Returns: " foo <b>bar</b>"
+echo $e->plaintext; // Returns: " foo bar"
+```
+
+Attribute Name	|Usage
+---|---
+$e->tag	|Read or write the tag name of element.
+$e->outertext	|Read or write the outer HTML text of element.
+$e->innertext	|Read or write the inner HTML text of element.
+$e->plaintext	|Read or write the plain text of element.
+
+### Трюки (не реализовано)
+
+```php    
+
+// Extract contents from HTML 
+echo $html->plaintext;
+
+// Wrap a element
+$e->outertext = '<div class="wrap">' . $e->outertext . '<div>';
+
+// Remove a element, set it's outertext as an empty string 
+$e->outertext = '';
+
+// Append a element
+$e->outertext = $e->outertext . '<div>foo<div>';
+
+// Insert a element
+$e->outertext = '<div>foo<div>' . $e->outertext;
+```
+
+## Прогон по DOM-дереву
+
+```php    
+
+// If you are not so familiar with HTML DOM, check this link to learn more... 
+
+// Example
+echo $html->find("#div1", 0)->children(1)->children(1)->children(2)->id;
+// or 
+echo $html->getElementById("div1")->childNodes(1)->childNodes(1)->childNodes(2)->getAttribute('id');
+```
+
+Method	|Description
+---|---
+`mixed` $e->children([int $index])	|Returns the Nth child object if index is set, otherwise return an array of children.
+`Element` $e->parent()	|Returns the parent of element.
+`Element` $e->first_child()	|Returns the first child of element, or null if not found.
+`Element` $e->last_child()	|Returns the last child of element, or null if not found.
+`Element` $e->next_sibling()	|Returns the next sibling of element, or null if not found.
+`Element` $e->prev_sibling()	|Returns the previous sibling of element, or null if not found.
+
+## API-справочник
+
+### Методы и свойства DOM
+
+Name	|Description
+---|---
+`void` __construct([string|Element $html])	|Constructor $html is text or Element.
+`string` plaintext	|Returns the contents extracted from HTML.
+`mixed` find (string $selector [, int $index])	|Find elements by the CSS selector. Returns the Nth element object if index is set, otherwise return an array of object.
+
+### Методы и свойства элементов
+
+Name	|Description
+---|---
+`string` [attribute]	|Read or write element's attribure value.
+`string` tag	|Read or write the tag name of element.
+`string` outertext	|Read or write the outer HTML text of element.
+`string` innertext	|Read or write the inner HTML text of element.
+`string` plaintext	|Read or write the plain text of element.
+`mixed` find (string $selector [, int $index])	|Find children by the CSS selector. Returns the Nth element object if index is set, otherwise, return an array of object.
+
+### Прогон по дереву DOM
+
+Name	|Description
+---|---
+`mixed` $e->children([int $index])	|Returns the Nth child object if index is set, otherwise return an array of children.
+`element` $e->parent()	|Returns the parent of element.
+`element` $e->first_child()	|Returns the first child of element, or null if not found.
+`element` $e->last_child()	|Returns the last child of element, or null if not found.
+`element` $e->next_sibling()	|Returns the next sibling of element, or null if not found.
+`element` $e->prev_sibling()	|Returns the previous sibling of element, or null if not found.
+
+### camelCase эквиваленты
+
+```php    
+
+string $e->getAttribute($name)
+string $e->attribute
+
+void $e->setAttribute($name, $value)
+void $value = $e->attribute
+
+bool $e->hasAttribute($name)
+bool isset($e->attribute)
+
+void $e->removeAttribute($name)
+void $e->attribute = null
+
+element $e->getElementById($id)
+mixed $e->find("#$id", 0)
+
+mixed $e->getElementsById($id [,$index] )
+mixed $e->find("#$id" [, int $index])
+
+element $e->getElementByTagName($name)
+mixed $e->find($name, 0)
+
+mixed $e->getElementsByTagName($name [, $index])
+mixed $e->find($name [, int $index])
+
+element $e->parentNode()
+element $e->parent()
+
+mixed $e->childNodes([$index])
+mixed $e->children([int $index])
+
+element $e->firstChild()
+element $e->first_child()
+
+element $e->lastChild()
+element $e->last_child()
+
+element $e->nextSibling()
+element $e->next_sibling()
+
+element $e->previousSibling()
+element $e->prev_sibling()
+```
