@@ -23,6 +23,11 @@ class Document
      */
     protected $document;
 
+    /**
+     * @var Callable
+     */
+    static protected $callback;
+
 
     /**
      * Constructor
@@ -63,13 +68,22 @@ class Document
         libxml_use_internal_errors(true);
         libxml_disable_entity_loader(true);
 
-        $this->document->loadHTML('<?xml encoding="UTF-8">'.$html);;
+        $this->document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_HTML_NOIMPLIED);
 
         libxml_clear_errors();
         libxml_disable_entity_loader(false);
         libxml_use_internal_errors(false);
 
         return $this;
+    }
+
+    /**
+     * @param $html
+     * @return Document
+     */
+    public function load($html)
+    {
+        return $this->loadHtml($html);
     }
 
     /**
@@ -84,7 +98,7 @@ class Document
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
         }
 
-        if (!file_exists($filePath)) {
+        if (!preg_match("/^https:\/\//i", $filePath) || !file_exists($filePath)) {
             throw new RuntimeException("File $filePath not found");
         }
 
@@ -99,6 +113,14 @@ class Document
         return $this;
     }
 
+    public function load_file($filePath)
+    {
+        return $this->loadHtmlFile($filePath);
+    }
+
+    /**
+     * @return DOMDocument
+     */
     public function getDocument()
     {
         return $this->document;
@@ -142,7 +164,13 @@ class Document
      */
     public function html()
     {
-        return trim($this->document->saveHTML($this->document->documentElement));
+        if ($this::$callback !== null)
+        {
+            call_user_func_array($this::$callback, array($this));
+        }
+
+        return trim($this->document->saveXML($this->document->documentElement));
+        //return trim($this->document->saveHTML($this->document->documentElement));
     }
 
     /**
@@ -190,14 +218,52 @@ class Document
     }
 
     /**
+     * Save dom as string
+     *
+     * @param string $filepath
+     * @return string
+     */
+    public function save($filepath = '')
+    {
+        $string = $this->innerHtml();
+        if ($filepath !== '') {
+            file_put_contents($filepath, $string, LOCK_EX);
+        }
+        return $string;
+    }
+
+    public function set_callback($functionName)
+    {
+        $this::$callback = $functionName;
+    }
+
+    /**
      * @param $name
      * @return string
      */
-    function __get($name) {
+    public function __get($name) {
         switch ($name) {
-            case 'outertext': return $this->outertext();
-            case 'innertext': return $this->innertext();
+            case 'outertext': return $this->html();
+            case 'innertext': return $this->innerHtml();
             case 'plaintext': return $this->text();
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->outertext();
+    }
+
+    /**
+     * @param string $selector
+     * @param int $idx
+     * @return Element|NodeList|null
+     */
+    public function __invoke($selector, $idx = null)
+    {
+        return $this->find($selector, $idx);
     }
 }

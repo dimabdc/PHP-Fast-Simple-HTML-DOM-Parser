@@ -41,6 +41,12 @@ class Element implements \IteratorAggregate
      */
     protected function replaceNode($string)
     {
+        if (empty($string)) {
+            $this->node->parentNode->removeChild($this->node);
+            unset($this);
+            return null;
+        }
+
         $newDocument = new Document($string);
         $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
 
@@ -57,13 +63,16 @@ class Element implements \IteratorAggregate
      */
     protected function replaceChild($string)
     {
-        $newDocument = new Document($string);
-        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
-
         foreach ($this->node->childNodes as $node) {
             $this->node->removeChild($node);
         }
-        $this->node->appendChild($newNode);
+
+        if (!empty($string)) {
+            $newDocument = new Document($string);
+            $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
+
+            $this->node->appendChild($newNode);
+        }
 
         return $this;
     }
@@ -327,7 +336,7 @@ class Element implements \IteratorAggregate
      */
     public function outertext()
     {
-        return $this->innerHtml();
+        return $this->html();
     }
 
     /**
@@ -337,7 +346,7 @@ class Element implements \IteratorAggregate
      */
     public function innertext()
     {
-        return $this->html();
+        return $this->innerHtml();
     }
 
     /**
@@ -401,10 +410,10 @@ class Element implements \IteratorAggregate
      * @param $name
      * @return array|null|string
      */
-    function __get($name) {
+    public function __get($name) {
         switch ($name) {
-            case 'outertext': return $this->outertext();
-            case 'innertext': return $this->innertext();
+            case 'outertext': return $this->html();
+            case 'innertext': return $this->innerHtml();
             case 'plaintext': return $this->text();
             case 'tag'      : return $this->node->nodeName;
             case 'attr'     : return $this->getAllAttributes();
@@ -412,7 +421,7 @@ class Element implements \IteratorAggregate
         }
     }
 
-    function __set($name, $value) {
+    public function __set($name, $value) {
         switch ($name) {
             case 'outertext': return $this->replaceNode($value);
             case 'innertext': return $this->replaceChild($value);
@@ -433,6 +442,30 @@ class Element implements \IteratorAggregate
             default         : return $this->hasAttribute($name);
         }
     }
+
+    public function __unset($name)
+    {
+        return $this->setAttribute($name, null);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->outertext();
+    }
+
+    /**
+     * @param string $selector
+     * @param int $idx
+     * @return Element|NodeList|null
+     */
+    public function __invoke($selector, $idx = null)
+    {
+        return $this->find($selector, $idx);
+    }
+
     /**
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php

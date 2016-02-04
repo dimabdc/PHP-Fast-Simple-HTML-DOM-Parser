@@ -41,7 +41,7 @@ class NodeList extends \ArrayObject
         return $text;
     }
 
-    public function outertext()
+    public function innertext()
     {
         $text = '';
         foreach ($this as $node) {
@@ -50,10 +50,28 @@ class NodeList extends \ArrayObject
         return $text;
     }
 
-    function __get($name) {
+    public function __get($name) {
         switch ($name) {
-            case 'outertext': return $this->outertext();
+            case 'innertext': return $this->innertext();
             case 'plaintext': return $this->text();
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->innertext();
+    }
+
+    /**
+     * @param string $selector
+     * @param int $idx
+     * @return Element|NodeList|null
+     */
+    public function __invoke($selector, $idx = null)
+    {
+        return $this->find($selector, $idx);
     }
 }
