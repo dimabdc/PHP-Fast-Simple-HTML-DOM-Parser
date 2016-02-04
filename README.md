@@ -140,7 +140,7 @@ Filter	|Description
 [attribute$=value]	|Matches elements that have the specified attribute and it ends with a certain value.
 [attribute*=value]	|Matches elements that have the specified attribute and it contains a certain value.
 
-### Текст, комментарии (не реализовано)
+### Текст, комментарии
 
 ```php    
 
@@ -160,11 +160,9 @@ $es = $html->find('comment');
 // Get a attribute ( If the attribute is non-value attribute (eg. checked, selected...), it will returns true or false)
 $value = $e->href;
 
-// Не реализовано
 // Set a attribute(If the attribute is non-value attribute (eg. checked, selected...), set it's value as true or false)
 $e->href = 'my link';
 
-// Не реализовано
 // Remove a attribute, set it's value as null! 
 $e->href = null;
 
@@ -194,7 +192,7 @@ $e->outertext	|Read or write the outer HTML text of element.
 $e->innertext	|Read or write the inner HTML text of element.
 $e->plaintext	|Read or write the plain text of element.
 
-### Трюки (не реализовано)
+### Трюки
 
 ```php    
 
