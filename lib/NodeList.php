@@ -22,7 +22,9 @@ class NodeList extends \ArrayObject
     {
         $elements = new NodeList();
         foreach ($this as $node) {
-            $elements->append($node->find($selector));
+            foreach ($node->find($selector) as $res) {
+                $elements->append($res);
+            }
         }
         if (is_null($idx)) {
             return $elements;
@@ -32,6 +34,11 @@ class NodeList extends \ArrayObject
         return (isset($elements[$idx])) ? $elements[$idx] : null;
     }
 
+    /**
+     * Get plain text
+     *
+     * @return string
+     */
     public function text()
     {
         $text = '';
@@ -41,7 +48,12 @@ class NodeList extends \ArrayObject
         return $text;
     }
 
-    public function innertext()
+    /**
+     * Get html of Elements
+     *
+     * @return string
+     */
+    public function innerHtml()
     {
         $text = '';
         foreach ($this as $node) {
@@ -50,9 +62,13 @@ class NodeList extends \ArrayObject
         return $text;
     }
 
+    /**
+     * @param $name
+     * @return string
+     */
     public function __get($name) {
         switch ($name) {
-            case 'innertext': return $this->innertext();
+            case 'innertext': return $this->innerHtml();
             case 'plaintext': return $this->text();
         }
     }
@@ -62,7 +78,7 @@ class NodeList extends \ArrayObject
      */
     public function __toString()
     {
-        return $this->innertext();
+        return $this->innerHtml();
     }
 
     /**

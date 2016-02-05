@@ -43,14 +43,14 @@ class Element implements \IteratorAggregate
     {
         if (empty($string)) {
             $this->node->parentNode->removeChild($this->node);
-            unset($this);
             return null;
         }
 
         $newDocument = new Document($string);
-        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
+        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
 
         $this->node->parentNode->replaceChild($newNode, $this->node);
+        $this->node = $newNode;
 
         return $this;
     }
@@ -69,7 +69,7 @@ class Element implements \IteratorAggregate
 
         if (!empty($string)) {
             $newDocument = new Document($string);
-            $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->lastChild->firstChild->firstChild, true);
+            $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
 
             $this->node->appendChild($newNode);
         }

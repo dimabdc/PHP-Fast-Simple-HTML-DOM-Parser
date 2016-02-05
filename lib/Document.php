@@ -98,11 +98,15 @@ class Document
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
         }
 
-        if (!preg_match("/^https:\/\//i", $filePath) || !file_exists($filePath)) {
+        if (!preg_match("/^https?:\/\//i", $filePath) && !file_exists($filePath)) {
             throw new RuntimeException("File $filePath not found");
         }
 
-        $html = file_get_contents($filePath);
+        try {
+            $html = file_get_contents($filePath);
+        } catch (\Exception $e) {
+            throw new RuntimeException("Could not load file $filePath");
+        }
 
         if ($html === false) {
             throw new RuntimeException("Could not load file $filePath");
@@ -113,6 +117,12 @@ class Document
         return $this;
     }
 
+    /**
+     * Load HTML from file
+     *
+     * @param $filePath
+     * @return Document
+     */
     public function load_file($filePath)
     {
         return $this->loadHtmlFile($filePath);
@@ -145,9 +155,6 @@ class Document
             $elements[] = new Element($node);
         }
 
-        $count = count($elements);
-        if ($count === 0) return array();
-
         if (is_null($idx)) {
             return $elements;
         } else if ($idx < 0) {
@@ -169,32 +176,7 @@ class Document
             call_user_func_array($this::$callback, array($this));
         }
 
-        return trim($this->document->saveXML($this->document->documentElement));
-        //return trim($this->document->saveHTML($this->document->documentElement));
-    }
-
-    /**
-     * Get dom node's inner html
-     *
-     * @return string
-     */
-    public function innerHtml()
-    {
-        $text = '';
-        foreach ($this->document->documentElement->childNodes as $node) {
-            $text .= trim($this->document->saveXML($node));
-        }
-        return $text;
-    }
-
-    /**
-     * Get dom node's plain text
-     *
-     * @return string
-     */
-    public function text()
-    {
-        return $this->document->textContent;
+        return trim($this->document->saveHTML($this->document->documentElement));
     }
 
     /**
@@ -212,9 +194,33 @@ class Document
      *
      * @return string
      */
+    public function innerHtml()
+    {
+        $text = '';
+        foreach ($this->document->documentElement->childNodes as $node) {
+            $text .= trim($this->document->saveXML($node));
+        }
+        return $text;
+    }
+
+    /**
+     * Get dom node's inner html
+     *
+     * @return string
+     */
     public function innertext()
     {
         return $this->innerHtml();
+    }
+
+    /**
+     * Get dom node's plain text
+     *
+     * @return string
+     */
+    public function text()
+    {
+        return $this->document->textContent;
     }
 
     /**
