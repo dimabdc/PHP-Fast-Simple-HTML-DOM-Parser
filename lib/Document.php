@@ -68,7 +68,12 @@ class Document
         libxml_use_internal_errors(true);
         libxml_disable_entity_loader(true);
 
-        $this->document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_HTML_NOIMPLIED);
+        $sxe = simplexml_load_string($html);
+        if (libxml_get_errors()) {
+            $this->document->loadHTML('<?xml encoding="UTF-8">' . $html);
+        } else {
+            $this->document = dom_import_simplexml($sxe)->ownerDocument;
+        }
 
         libxml_clear_errors();
         libxml_disable_entity_loader(false);

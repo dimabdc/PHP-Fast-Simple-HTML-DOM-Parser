@@ -5,6 +5,7 @@ namespace FastSimpleHTMLDom;
 
 use DOMElement;
 use DOMNode;
+use RuntimeException;
 
 /**
  * Class Element
@@ -47,6 +48,11 @@ class Element implements \IteratorAggregate
         }
 
         $newDocument = new Document($string);
+
+        if ($newDocument->outertext != $string) {
+            throw new RuntimeException("Not valid HTML fragment");
+        }
+
         $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
 
         $this->node->parentNode->replaceChild($newNode, $this->node);
@@ -63,14 +69,20 @@ class Element implements \IteratorAggregate
      */
     protected function replaceChild($string)
     {
+        if (!empty($string)) {
+            $newDocument = new Document($string);
+
+            if ($newDocument->outertext != $string) {
+                throw new RuntimeException("Not valid HTML fragment");
+            }
+        }
+
         foreach ($this->node->childNodes as $node) {
             $this->node->removeChild($node);
         }
 
         if (!empty($string)) {
-            $newDocument = new Document($string);
             $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
-
             $this->node->appendChild($newNode);
         }
 

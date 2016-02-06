@@ -41,7 +41,7 @@ class NodeListTest extends TestCase
             array($html, 'input[id=in]', 1),
             array($html, '#in', 1),
             array($html, '*[id]', 51),
-            array($html, 'text', 539),
+            array($html, 'text', 390),
         );
     }
 

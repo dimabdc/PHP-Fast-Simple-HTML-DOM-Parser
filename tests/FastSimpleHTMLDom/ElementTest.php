@@ -11,14 +11,15 @@ class ElementTest extends TestCase
 {
     public function testConstructor()
     {
-        $html = '<input name="username" value="John">';
+        $html = '<input name="username" value="John">User name</input>';
 
         $document = new Document($html);
         $node = $document->getDocument()->documentElement;
+
         $element = new Element($node);
 
         $this->assertEquals('input', $element->tag);
-        $this->assertEquals('', $element->plaintext);
+        $this->assertEquals('User name', $element->plaintext);
         $this->assertEquals('username', $element->name);
         $this->assertEquals('John', $element->value);
     }
@@ -113,7 +114,7 @@ class ElementTest extends TestCase
             array($html, 'input[id=in]', 1),
             array($html, '#in', 1),
             array($html, '*[id]', 52),
-            array($html, 'text', 640),
+            array($html, 'text', 462),
             array($html, 'comment', 3),
         );
     }
