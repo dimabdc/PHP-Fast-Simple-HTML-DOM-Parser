@@ -3,6 +3,7 @@
 namespace FastSimpleHTMLDom;
 
 
+use BadMethodCallException;
 use DOMElement;
 use DOMNode;
 use RuntimeException;
@@ -10,9 +11,20 @@ use RuntimeException;
 /**
  * Class Element
  * @package FastSimpleHTMLDom
- * @property string outertext Get dom node's outer html
- * @property string innertext Get dom node's inner html
- * @property string plaintext Get dom node's plain text
+ * @property string      outertext Get dom node's outer html
+ * @property string      innertext Get dom node's inner html
+ * @property-read string plaintext Get dom node's plain text
+ * @property-read string tag       Get dom node name
+ * @property-read string attr      Get dom node attributes
+ *
+ * @method NodeList|Element|null children() children($idx = -1) Returns children of node
+ * @method Element|null first_child() Returns the first child of node
+ * @method Element|null last_child() Returns the last child of node
+ * @method Element|null next_sibling() Returns the next sibling of node
+ * @method Element|null prev_sibling() Returns the previous sibling of node
+ * @method Element|null parent() Returns the parent of node
+ * @method string outertext() Get dom node's outer html
+ * @method string innertext() Get dom node's inner html
  */
 class Element implements \IteratorAggregate
 {
@@ -20,6 +32,21 @@ class Element implements \IteratorAggregate
      * @var DOMElement
      */
     protected $node;
+
+    /**
+     * @var array
+     */
+    protected $functionAliases = [
+        'children'     => 'childNodes',
+        'first_child'  => 'firstChild',
+        'last_child'   => 'lastChild',
+        'next_sibling' => 'nextSibling',
+        'prev_sibling' => 'previousSibling',
+        'parent'       => 'parentNode',
+        'outertext'    => 'html',
+        'innertext'    => 'innerHtml',
+    ];
+
 
     public function __construct(DOMNode $node)
     {
@@ -38,12 +65,14 @@ class Element implements \IteratorAggregate
      * Replace this node
      *
      * @param $string
+     *
      * @return $this
      */
     protected function replaceNode($string)
     {
         if (empty($string)) {
             $this->node->parentNode->removeChild($this->node);
+
             return null;
         }
 
@@ -65,6 +94,7 @@ class Element implements \IteratorAggregate
      * Replace child node
      *
      * @param $string
+     *
      * @return $this
      */
     protected function replaceChild($string)
@@ -101,7 +131,8 @@ class Element implements \IteratorAggregate
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return NodeList|Element|null
      */
     public function find($selector, $idx = null)
@@ -113,6 +144,7 @@ class Element implements \IteratorAggregate
      * Return Element by id
      *
      * @param $id
+     *
      * @return Element|null
      */
     public function getElementById($id)
@@ -123,8 +155,9 @@ class Element implements \IteratorAggregate
     /**
      * Returns Elements by id
      *
-     * @param $id
+     * @param      $id
      * @param null $idx
+     *
      * @return Element|NodeList|null
      */
     public function getElementsById($id, $idx = null)
@@ -136,6 +169,7 @@ class Element implements \IteratorAggregate
      * Return Element by tag name
      *
      * @param $name
+     *
      * @return Element|null
      */
     public function getElementByTagName($name)
@@ -146,8 +180,9 @@ class Element implements \IteratorAggregate
     /**
      * Returns Elements by tag name
      *
-     * @param $name
+     * @param      $name
      * @param null $idx
+     *
      * @return Element|NodeList|null
      */
     public function getElementsByTagName($name, $idx = null)
@@ -159,6 +194,7 @@ class Element implements \IteratorAggregate
      * Returns children of node
      *
      * @param int $idx
+     *
      * @return NodeList|Element|null
      */
     public function childNodes($idx = -1)
@@ -174,17 +210,6 @@ class Element implements \IteratorAggregate
         }
 
         return null;
-    }
-
-    /**
-     * Returns children of node
-     *
-     * @param int $idx
-     * @return NodeList|Element|null
-     */
-    public function children($idx = -1)
-    {
-        return $this->childNodes($idx);
     }
 
     /**
@@ -204,16 +229,6 @@ class Element implements \IteratorAggregate
     }
 
     /**
-     * Returns the first child of node
-     *
-     * @return Element|null
-     */
-    public function first_child()
-    {
-        return $this->firstChild();
-    }
-
-    /**
      * Returns the last child of node
      *
      * @return Element|null
@@ -227,16 +242,6 @@ class Element implements \IteratorAggregate
         }
 
         return new Element($node);
-    }
-
-    /**
-     * Returns the last child of node
-     *
-     * @return Element|null
-     */
-    public function last_child()
-    {
-        return $this->lastChild();
     }
 
     /**
@@ -256,16 +261,6 @@ class Element implements \IteratorAggregate
     }
 
     /**
-     * Returns the next sibling of node
-     *
-     * @return Element|null
-     */
-    public function next_sibling()
-    {
-        return $this->nextSibling();
-    }
-
-    /**
      * Returns the previous sibling of node
      *
      * @return Element|null
@@ -282,16 +277,6 @@ class Element implements \IteratorAggregate
     }
 
     /**
-     * Returns the previous sibling of node
-     *
-     * @return Element|null
-     */
-    public function prev_sibling()
-    {
-        return $this->previousSibling();
-    }
-
-    /**
      * Returns the parent of node
      *
      * @return Element
@@ -299,16 +284,6 @@ class Element implements \IteratorAggregate
     public function parentNode()
     {
         return new Element($this->node->parentNode);
-    }
-
-    /**
-     * Returns the parent of node
-     *
-     * @return Element
-     */
-    public function parent()
-    {
-        return $this->parentNode();
     }
 
     /**
@@ -342,26 +317,6 @@ class Element implements \IteratorAggregate
     }
 
     /**
-     * Get dom node's outer html
-     *
-     * @return string
-     */
-    public function outertext()
-    {
-        return $this->html();
-    }
-
-    /**
-     * Get dom node's inner html
-     *
-     * @return string
-     */
-    public function innertext()
-    {
-        return $this->innerHtml();
-    }
-
-    /**
      * Returns array of attributes
      *
      * @return array|null
@@ -373,8 +328,10 @@ class Element implements \IteratorAggregate
             foreach ($this->node->attributes as $attr) {
                 $attributes[$attr->name] = $attr->value;
             }
+
             return $attributes;
         }
+
         return null;
     }
 
@@ -382,6 +339,7 @@ class Element implements \IteratorAggregate
      * Return attribute value
      *
      * @param string $name
+     *
      * @return string|null
      */
     public function getAttribute($name)
@@ -394,6 +352,7 @@ class Element implements \IteratorAggregate
      *
      * @param $name
      * @param $value
+     *
      * @return $this
      */
     public function setAttribute($name, $value)
@@ -411,6 +370,7 @@ class Element implements \IteratorAggregate
      * Determine if an attribute exists on the element.
      *
      * @param $name
+     *
      * @return bool
      */
     public function hasAttribute($name)
@@ -420,38 +380,54 @@ class Element implements \IteratorAggregate
 
     /**
      * @param $name
+     *
      * @return array|null|string
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         switch ($name) {
-            case 'outertext': return $this->html();
-            case 'innertext': return $this->innerHtml();
-            case 'plaintext': return $this->text();
-            case 'tag'      : return $this->node->nodeName;
-            case 'attr'     : return $this->getAllAttributes();
-            default         : return $this->getAttribute($name);
+            case 'outertext':
+                return $this->html();
+            case 'innertext':
+                return $this->innerHtml();
+            case 'plaintext':
+                return $this->text();
+            case 'tag'      :
+                return $this->node->nodeName;
+            case 'attr'     :
+                return $this->getAllAttributes();
+            default         :
+                return $this->getAttribute($name);
         }
     }
 
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         switch ($name) {
-            case 'outertext': return $this->replaceNode($value);
-            case 'innertext': return $this->replaceChild($value);
-            default         : return $this->setAttribute($name, $value);
+            case 'outertext':
+                return $this->replaceNode($value);
+            case 'innertext':
+                return $this->replaceChild($value);
+            default         :
+                return $this->setAttribute($name, $value);
         }
     }
 
     /**
      * @param $name
+     *
      * @return bool
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         switch ($name) {
             case 'outertext':
             case 'innertext':
             case 'plaintext':
-            case 'tag'      : return true;
-            default         : return $this->hasAttribute($name);
+            case 'tag'      :
+                return true;
+            default         :
+                return $this->hasAttribute($name);
         }
     }
 
@@ -465,12 +441,13 @@ class Element implements \IteratorAggregate
      */
     public function __toString()
     {
-        return $this->outertext();
+        return $this->html();
     }
 
     /**
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return Element|NodeList|null
      */
     public function __invoke($selector, $idx = null)
@@ -479,8 +456,23 @@ class Element implements \IteratorAggregate
     }
 
     /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return null|string|Element
+     *
+     */
+    public function __call($name, $arguments)
+    {
+        if (isset($this->functionAliases[$name])) {
+            return call_user_func_array([$this, $this->functionAliases[$name]], $arguments);
+        }
+        throw new BadMethodCallException('Method does not exist');
+    }
+
+    /**
      * Retrieve an external iterator
-     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
      * @return NodeList An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      * @since 5.0.0
@@ -493,6 +485,7 @@ class Element implements \IteratorAggregate
                 $elements[] = new Element($node);
             }
         }
+
         return $elements;
     }
 }

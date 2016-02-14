@@ -2,6 +2,7 @@
 
 namespace Tests\FastSimpleHTMLDom;
 
+use BadMethodCallException;
 use FastSimpleHTMLDom\Document;
 use FastSimpleHTMLDom\Element;
 use InvalidArgumentException;
@@ -15,7 +16,7 @@ class DocumentTest extends TestCase
      */
     public function testConstructWithInvalidArgument()
     {
-        new Document(array('foo'));
+        new Document(['foo']);
     }
 
     /**
@@ -24,7 +25,7 @@ class DocumentTest extends TestCase
     public function testLoadHtmlWithInvalidArgument()
     {
         $document = new Document();
-        $document->loadHtml(array('foo'));
+        $document->loadHtml(['foo']);
     }
 
     /**
@@ -33,7 +34,7 @@ class DocumentTest extends TestCase
     public function testLoadWithInvalidArgument()
     {
         $document = new Document();
-        $document->load(array('foo'));
+        $document->load(['foo']);
     }
 
     /**
@@ -42,7 +43,7 @@ class DocumentTest extends TestCase
     public function testLoadHtmlFileWithInvalidArgument()
     {
         $document = new Document();
-        $document->loadHtmlFile(array('foo'));
+        $document->loadHtmlFile(['foo']);
     }
 
     /**
@@ -51,7 +52,7 @@ class DocumentTest extends TestCase
     public function testLoad_fileWithInvalidArgument()
     {
         $document = new Document();
-        $document->load_file(array('foo'));
+        $document->load_file(['foo']);
     }
 
     /**
@@ -72,6 +73,30 @@ class DocumentTest extends TestCase
         $document->loadHtmlFile('http://fobar');
     }
 
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testMethodNotExist()
+    {
+        $document = new Document();
+        $document->bar();
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testStaticMethodNotExist()
+    {
+        Document::bar();
+    }
+
+    public function testNotExistProperty()
+    {
+        $document = new Document();
+
+        $this->assertNull($document->foo);
+    }
+
     public function testConstruct()
     {
         $html = '<div>foo</div>';
@@ -86,8 +111,29 @@ class DocumentTest extends TestCase
     {
         $file = __DIR__ . '/../fixtures/testpage.html';
         $document = new Document();
-        $document->loadHtmlFile($file);
 
+        $document->loadHtmlFile($file);
+        $this->assertNotNull(count($document('div')));
+
+        $document->load_file($file);
+        $this->assertNotNull(count($document('div')));
+
+        $document = Document::file_get_html($file);
+        $this->assertNotNull(count($document('div')));
+    }
+
+    public function testLoadHtml()
+    {
+        $html = $this->loadFixture('testpage.html');
+        $document = new Document();
+
+        $document->loadHtml($html);
+        $this->assertNotNull(count($document('div')));
+
+        $document->load($html);
+        $this->assertNotNull(count($document('div')));
+
+        $document = Document::str_get_html($html);
         $this->assertNotNull(count($document('div')));
     }
 
@@ -102,7 +148,7 @@ class DocumentTest extends TestCase
      */
     public function testFind($html, $selector, $count)
     {
-        $document = new Document($html, false);
+        $document = new Document($html);
         $elements = $document->find($selector);
 
         $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
@@ -112,7 +158,7 @@ class DocumentTest extends TestCase
             $this->assertInstanceOf('FastSimpleHTMLDom\Element', $element);
         }
 
-        if ($count !== 0){
+        if ($count !== 0) {
             $element = $document->find($selector, -1);
             $this->assertInstanceOf('FastSimpleHTMLDom\Element', $element);
         }
@@ -121,20 +167,21 @@ class DocumentTest extends TestCase
     public function findTests()
     {
         $html = $this->loadFixture('testpage.html');
-        return array(
-            array($html, '.fake h2', 0),
-            array($html, 'article', 16),
-            array($html, '.radio', 3),
-            array($html, 'input.radio', 3),
-            array($html, 'ul li', 35),
-            array($html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6),
-            array($html, 'input[id]', 23),
-            array($html, 'input[id=in]', 1),
-            array($html, '#in', 1),
-            array($html, '*[id]', 52),
-            array($html, 'text', 462),
-            array($html, 'comment', 3),
-        );
+
+        return [
+            [$html, '.fake h2', 0],
+            [$html, 'article', 16],
+            [$html, '.radio', 3],
+            [$html, 'input.radio', 3],
+            [$html, 'ul li', 35],
+            [$html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6],
+            [$html, 'input[id]', 23],
+            [$html, 'input[id=in]', 1],
+            [$html, '#in', 1],
+            [$html, '*[id]', 52],
+            [$html, 'text', 462],
+            [$html, 'comment', 3],
+        ];
     }
 
     public function testHtml()
@@ -180,5 +227,12 @@ class DocumentTest extends TestCase
         $document = new Document($html);
 
         $this->assertTrue(is_string($document->save()));
+    }
+
+    public function testClear()
+    {
+        $document = new Document();
+
+        $this->assertNull($document->clear());
     }
 }

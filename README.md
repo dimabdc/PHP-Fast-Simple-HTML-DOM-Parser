@@ -20,7 +20,7 @@ require_once "vendor/autoload.php";
 use FastSimpleHTMLDom\Document;
 
 // Create DOM from URL
-$html = new Document(file_get_contents('https://habrahabr.ru/interesting/'));
+$html = Document::file_get_html('https://habrahabr.ru/interesting/');
 
 // Find all post blocks
 $post = [];
@@ -109,7 +109,7 @@ $es = $html->find('div div div');
 $es = $html->find('table.hello td');
 
 // Find all td tags with attribite align=center in table tags 
-$es = $html->find(''table td[align=center]');
+$es = $html->find('table td[align=center]');
 ```
 
 ### Вложенные селекторы
@@ -177,13 +177,13 @@ if(isset($e->href))
 ```php    
 
 // Example
-$html = str_get_html("<div>foo <b>bar</b></div>"); 
-$e = $html->find("div", 0);
+$html = str_get_html('<div>foo <b>bar</b></div>'); 
+$e = $html->find('div', 0);
 
-echo $e->tag; // Returns: " div"
-echo $e->outertext; // Returns: " <div>foo <b>bar</b></div>"
-echo $e->innertext; // Returns: " foo <b>bar</b>"
-echo $e->plaintext; // Returns: " foo bar"
+echo $e->tag; // Returns: "div"
+echo $e->outertext; // Returns: "<div>foo <b>bar</b></div>"
+echo $e->innertext; // Returns: "foo <b>bar</b>"
+echo $e->plaintext; // Returns: "foo bar"
 ```
 
 Attribute Name	|Usage
@@ -220,9 +220,9 @@ $e->outertext = '<div>foo<div>' . $e->outertext;
 // If you are not so familiar with HTML DOM, check this link to learn more... 
 
 // Example
-echo $html->find("#div1", 0)->children(1)->children(1)->children(2)->id;
+echo $html->find('#div1', 0)->children(1)->children(1)->children(2)->id;
 // or 
-echo $html->getElementById("div1")->childNodes(1)->childNodes(1)->childNodes(2)->getAttribute('id');
+echo $html->getElementById('div1')->childNodes(1)->childNodes(1)->childNodes(2)->getAttribute('id');
 ```
 
 Method	|Description
@@ -285,7 +285,7 @@ void $e->attribute = null
 element $e->getElementById($id)
 mixed $e->find("#$id", 0)
 
-mixed $e->getElementsById($id [,$index] )
+mixed $e->getElementsById($id [,$index])
 mixed $e->find("#$id" [, int $index])
 
 element $e->getElementByTagName($name)

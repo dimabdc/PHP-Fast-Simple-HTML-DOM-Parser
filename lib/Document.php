@@ -3,6 +3,7 @@
 namespace FastSimpleHTMLDom;
 
 
+use BadMethodCallException;
 use DOMDocument;
 use DOMXPath;
 use InvalidArgumentException;
@@ -12,9 +13,17 @@ use RuntimeException;
  * Class Document
  * @package FastSimpleHTMLDom
  *
- * @property string outertext Get dom node's outer html
- * @property string innertext Get dom node's inner html
- * @property string plaintext Get dom node's plain text
+ * @property string      outertext Get dom node's outer html
+ * @property string      innertext Get dom node's inner html
+ * @property-read string plaintext Get dom node's plain text
+ *
+ * @method string outertext() Get dom node's outer html
+ * @method string innertext() Get dom node's inner html
+ * @method Document load() load($html) Load HTML from string
+ * @method Document load_file() load_file($html) Load HTML from file
+ *
+ * @method static Document file_get_html() file_get_html($html) Load HTML from file
+ * @method static Document str_get_html() str_get_html($html) Load HTML from string
  */
 class Document
 {
@@ -22,6 +31,16 @@ class Document
      * @var DOMDocument
      */
     protected $document;
+
+    /**
+     * @var array
+     */
+    protected $functionAliases = [
+        'outertext' => 'html',
+        'innertext' => 'innerHtml',
+        'load'      => 'loadHtml',
+        'load_file' => 'loadHtmlFile',
+    ];
 
     /**
      * @var Callable
@@ -56,6 +75,7 @@ class Document
      * Load HTML from string
      *
      * @param string $html
+     *
      * @return Document
      * @throws InvalidArgumentException if argument is not string
      */
@@ -83,18 +103,10 @@ class Document
     }
 
     /**
-     * @param $html
-     * @return Document
-     */
-    public function load($html)
-    {
-        return $this->loadHtml($html);
-    }
-
-    /**
      * Load HTML from file
      *
      * @param string $filePath
+     *
      * @return Document
      */
     public function loadHtmlFile($filePath)
@@ -123,17 +135,6 @@ class Document
     }
 
     /**
-     * Load HTML from file
-     *
-     * @param $filePath
-     * @return Document
-     */
-    public function load_file($filePath)
-    {
-        return $this->loadHtmlFile($filePath);
-    }
-
-    /**
      * @return DOMDocument
      */
     public function getDocument()
@@ -145,14 +146,15 @@ class Document
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return NodeList|Element|null
      */
     public function find($selector, $idx = null)
     {
         $xPathQuery = SelectorConverter::toXPath($selector);
 
-        $xPath    = new DOMXPath($this->document);
+        $xPath = new DOMXPath($this->document);
         $nodesList = $xPath->query($xPathQuery);
         $elements = new NodeList();
 
@@ -162,8 +164,10 @@ class Document
 
         if (is_null($idx)) {
             return $elements;
-        } else if ($idx < 0) {
-            $idx = count($elements) + $idx;
+        } else {
+            if ($idx < 0) {
+                $idx = count($elements) + $idx;
+            }
         }
 
         return (isset($elements[$idx])) ? $elements[$idx] : null;
@@ -176,22 +180,11 @@ class Document
      */
     public function html()
     {
-        if ($this::$callback !== null)
-        {
-            call_user_func_array($this::$callback, array($this));
+        if ($this::$callback !== null) {
+            call_user_func_array($this::$callback, [$this]);
         }
 
         return trim($this->document->saveHTML($this->document->documentElement));
-    }
-
-    /**
-     * Get dom node's outer html
-     *
-     * @return string
-     */
-    public function outertext()
-    {
-        return $this->html();
     }
 
     /**
@@ -205,17 +198,8 @@ class Document
         foreach ($this->document->documentElement->childNodes as $node) {
             $text .= trim($this->document->saveXML($node));
         }
-        return $text;
-    }
 
-    /**
-     * Get dom node's inner html
-     *
-     * @return string
-     */
-    public function innertext()
-    {
-        return $this->innerHtml();
+        return $text;
     }
 
     /**
@@ -232,6 +216,7 @@ class Document
      * Save dom as string
      *
      * @param string $filepath
+     *
      * @return string
      */
     public function save($filepath = '')
@@ -240,24 +225,39 @@ class Document
         if ($filepath !== '') {
             file_put_contents($filepath, $string, LOCK_EX);
         }
+
         return $string;
     }
 
+    /**
+     * @param $functionName
+     */
     public function set_callback($functionName)
     {
         $this::$callback = $functionName;
     }
 
+    public function clear()
+    {
+    }
+
     /**
      * @param $name
+     *
      * @return string
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         switch ($name) {
-            case 'outertext': return $this->html();
-            case 'innertext': return $this->innerHtml();
-            case 'plaintext': return $this->text();
+            case 'outertext':
+                return $this->html();
+            case 'innertext':
+                return $this->innerHtml();
+            case 'plaintext':
+                return $this->text();
         }
+
+        return null;
     }
 
     /**
@@ -265,16 +265,53 @@ class Document
      */
     public function __toString()
     {
-        return $this->outertext();
+        return $this->html();
     }
 
     /**
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return Element|NodeList|null
      */
     public function __invoke($selector, $idx = null)
     {
         return $this->find($selector, $idx);
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return bool|mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (isset($this->functionAliases[$name])) {
+            return call_user_func_array([$this, $this->functionAliases[$name]], $arguments);
+        }
+        throw new BadMethodCallException('Method does not exist');
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return bool|Document
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        if ($name == 'str_get_html') {
+            $document = new Document();
+
+            return $document->loadHtml($arguments[0]);
+        }
+
+        if ($name == 'file_get_html') {
+            $document = new Document();
+
+            return $document->loadHtmlFile($arguments[0]);
+        }
+        throw new BadMethodCallException('Method does not exist');
     }
 }

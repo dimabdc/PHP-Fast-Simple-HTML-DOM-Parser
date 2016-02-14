@@ -6,8 +6,8 @@ namespace FastSimpleHTMLDom;
 /**
  * Class NodeList
  * @package FastSimpleHTMLDom
- * @property string outertext Get dom node's outer html
- * @property string plaintext Get dom node's plain text
+ * @property-read string outertext Get dom node's outer html
+ * @property-read string plaintext Get dom node's plain text
  */
 class NodeList extends \ArrayObject
 {
@@ -15,7 +15,8 @@ class NodeList extends \ArrayObject
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return NodeList|Element|null
      */
     public function find($selector, $idx = null)
@@ -28,9 +29,12 @@ class NodeList extends \ArrayObject
         }
         if (is_null($idx)) {
             return $elements;
-        } else if ($idx < 0) {
-            $idx = count($elements) + $idx;
+        } else {
+            if ($idx < 0) {
+                $idx = count($elements) + $idx;
+            }
         }
+
         return (isset($elements[$idx])) ? $elements[$idx] : null;
     }
 
@@ -45,6 +49,7 @@ class NodeList extends \ArrayObject
         foreach ($this as $node) {
             $text .= $node->plaintext;
         }
+
         return $text;
     }
 
@@ -59,18 +64,25 @@ class NodeList extends \ArrayObject
         foreach ($this as $node) {
             $text .= $node->outertext;
         }
+
         return $text;
     }
 
     /**
      * @param $name
+     *
      * @return string
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         switch ($name) {
-            case 'innertext': return $this->innerHtml();
-            case 'plaintext': return $this->text();
+            case 'innertext':
+                return $this->innerHtml();
+            case 'plaintext':
+                return $this->text();
         }
+
+        return null;
     }
 
     /**
@@ -83,7 +95,8 @@ class NodeList extends \ArrayObject
 
     /**
      * @param string $selector
-     * @param int $idx
+     * @param int    $idx
+     *
      * @return Element|NodeList|null
      */
     public function __invoke($selector, $idx = null)

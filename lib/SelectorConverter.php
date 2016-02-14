@@ -14,10 +14,12 @@ class SelectorConverter
             return self::$compiled[$selector];
         }
 
+        // Select DOMText
         if ($selector === 'text') {
             return '//text()';
         }
 
+        // Select DOMComment
         if ($selector === 'comment') {
             return '//comment()';
         }

@@ -4,7 +4,6 @@ namespace Tests\FastSimpleHTMLDom;
 
 
 use FastSimpleHTMLDom\Document;
-use FastSimpleHTMLDom\Element;
 use Tests\TestCase;
 
 class NodeListTest extends TestCase
