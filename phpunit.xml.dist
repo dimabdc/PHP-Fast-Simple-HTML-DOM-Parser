@@ -9,8 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="./tests/bootstrap.php"
-        >
+         bootstrap="./tests/bootstrap.php">
     <testsuites>
         <testsuite name="Test Suite">
             <directory>./tests/FastSimpleHTMLDom</directory>
