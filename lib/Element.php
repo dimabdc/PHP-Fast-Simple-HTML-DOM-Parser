@@ -68,7 +68,7 @@ class Element implements \IteratorAggregate
      *
      * @return $this
      */
-    protected function replaceNode($string)
+    protected function replaceNode($string): Element
     {
         if (empty($string)) {
             $this->node->parentNode->removeChild($this->node);
@@ -97,21 +97,19 @@ class Element implements \IteratorAggregate
      *
      * @return $this
      */
-    protected function replaceChild($string)
+    protected function replaceChild($string): Element
     {
+        foreach ($this->node->childNodes as $node) {
+            $this->node->removeChild($node);
+        }
+
         if (!empty($string)) {
             $newDocument = new Document($string);
 
             if ($newDocument->outertext != $string) {
                 throw new RuntimeException("Not valid HTML fragment");
             }
-        }
 
-        foreach ($this->node->childNodes as $node) {
-            $this->node->removeChild($node);
-        }
-
-        if (!empty($string)) {
             $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
             $this->node->appendChild($newNode);
         }
@@ -122,7 +120,7 @@ class Element implements \IteratorAggregate
     /**
      * @return Document
      */
-    public function getDom()
+    public function getDom(): Document
     {
         return new Document($this);
     }
@@ -147,7 +145,7 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function getElementById($id)
+    public function getElementById($id): Element
     {
         return $this->find("#$id", 0);
     }
@@ -172,7 +170,7 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function getElementByTagName($name)
+    public function getElementByTagName($name): Element
     {
         return $this->find($name, 0);
     }
@@ -217,15 +215,9 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function firstChild()
+    public function firstChild(): Element
     {
-        $node = $this->node->firstChild;
-
-        if ($node === null) {
-            return null;
-        }
-
-        return new Element($node);
+        return ($this->node->firstChild === null) ? null : new Element($this->node->firstChild);
     }
 
     /**
@@ -233,15 +225,9 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function lastChild()
+    public function lastChild(): Element
     {
-        $node = $this->node->lastChild;
-
-        if ($node === null) {
-            return null;
-        }
-
-        return new Element($node);
+        return ($this->node->lastChild === null) ? null : new Element($this->node->lastChild);
     }
 
     /**
@@ -249,15 +235,9 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function nextSibling()
+    public function nextSibling(): Element
     {
-        $node = $this->node->nextSibling;
-
-        if ($node === null) {
-            return null;
-        }
-
-        return new Element($node);
+        return ($this->node->nextSibling === null) ? null : new Element($this->node->nextSibling);
     }
 
     /**
@@ -265,15 +245,9 @@ class Element implements \IteratorAggregate
      *
      * @return Element|null
      */
-    public function previousSibling()
+    public function previousSibling(): Element
     {
-        $node = $this->node->previousSibling;
-
-        if ($node === null) {
-            return null;
-        }
-
-        return new Element($node);
+        return ($this->node->previousSibling === null) ? null : new Element($this->node->previousSibling);
     }
 
     /**
@@ -281,7 +255,7 @@ class Element implements \IteratorAggregate
      *
      * @return Element
      */
-    public function parentNode()
+    public function parentNode(): Element
     {
         return new Element($this->node->parentNode);
     }
@@ -291,7 +265,7 @@ class Element implements \IteratorAggregate
      *
      * @return string
      */
-    public function html()
+    public function html(): string
     {
         return $this->getDom()->html();
     }
@@ -301,7 +275,7 @@ class Element implements \IteratorAggregate
      *
      * @return string
      */
-    public function innerHtml()
+    public function innerHtml(): string
     {
         return $this->getDom()->innerHtml();
     }
@@ -311,7 +285,7 @@ class Element implements \IteratorAggregate
      *
      * @return string
      */
-    public function text()
+    public function text(): string
     {
         return $this->node->textContent;
     }
@@ -321,7 +295,7 @@ class Element implements \IteratorAggregate
      *
      * @return array|null
      */
-    public function getAllAttributes()
+    public function getAllAttributes(): array
     {
         if ($this->node->hasAttributes()) {
             $attributes = [];
@@ -342,7 +316,7 @@ class Element implements \IteratorAggregate
      *
      * @return string|null
      */
-    public function getAttribute($name)
+    public function getAttribute($name): string
     {
         return $this->node->getAttribute($name);
     }
@@ -355,7 +329,7 @@ class Element implements \IteratorAggregate
      *
      * @return $this
      */
-    public function setAttribute($name, $value)
+    public function setAttribute($name, $value): Element
     {
         if (empty($value)) {
             $this->node->removeAttribute($name);
@@ -373,7 +347,7 @@ class Element implements \IteratorAggregate
      *
      * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute($name): bool
     {
         return $this->node->hasAttribute($name);
     }
@@ -439,7 +413,7 @@ class Element implements \IteratorAggregate
     /**
      * @return mixed
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->html();
     }

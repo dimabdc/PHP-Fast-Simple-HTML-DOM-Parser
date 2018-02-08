@@ -19,7 +19,7 @@ class NodeList extends \ArrayObject
      *
      * @return NodeList|Element|null
      */
-    public function find($selector, $idx = null)
+    public function find(string $selector, int $idx = null)
     {
         $elements = new NodeList();
         foreach ($this as $node) {
@@ -58,14 +58,9 @@ class NodeList extends \ArrayObject
      *
      * @return string
      */
-    public function innerHtml()
+    public function innerHtml(): string
     {
-        $text = '';
-        foreach ($this as $node) {
-            $text .= $node->outertext;
-        }
-
-        return $text;
+        return join("", array_map(function ($i) { return $i->outtext; }, $this->getArrayCopy()));
     }
 
     /**
@@ -73,22 +68,15 @@ class NodeList extends \ArrayObject
      *
      * @return string
      */
-    public function __get($name)
+    public function __get($name): string
     {
-        switch ($name) {
-            case 'innertext':
-                return $this->innerHtml();
-            case 'plaintext':
-                return $this->text();
-        }
-
-        return null;
+        return ($name == 'innertext') ? $this->innerHtml() : (($name == 'plaintext') ? $this->text() : null);
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->innerHtml();
     }

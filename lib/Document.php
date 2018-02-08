@@ -79,7 +79,7 @@ class Document
      * @return Document
      * @throws InvalidArgumentException if argument is not string
      */
-    public function loadHtml($html)
+    public function loadHtml(string $html): Document
     {
         if (!is_string($html)) {
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
@@ -109,7 +109,7 @@ class Document
      *
      * @return Document
      */
-    public function loadHtmlFile($filePath)
+    public function loadHtmlFile(string $filePath): Document
     {
         if (!is_string($filePath)) {
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
@@ -137,7 +137,7 @@ class Document
     /**
      * @return DOMDocument
      */
-    public function getDocument()
+    public function getDocument(): DOMDocument
     {
         return $this->document;
     }
@@ -178,7 +178,7 @@ class Document
      *
      * @return string
      */
-    public function html()
+    public function html(): string
     {
         if ($this::$callback !== null) {
             call_user_func_array($this::$callback, [$this]);
@@ -192,7 +192,7 @@ class Document
      *
      * @return string
      */
-    public function innerHtml()
+    public function innerHtml(): string
     {
         $text = '';
         foreach ($this->document->documentElement->childNodes as $node) {
@@ -207,7 +207,7 @@ class Document
      *
      * @return string
      */
-    public function text()
+    public function text(): string
     {
         return $this->document->textContent;
     }
@@ -215,15 +215,15 @@ class Document
     /**
      * Save dom as string
      *
-     * @param string $filepath
+     * @param string $filePath
      *
      * @return string
      */
-    public function save($filepath = '')
+    public function save(string $filePath = ''): string
     {
         $string = $this->innerHtml();
-        if ($filepath !== '') {
-            file_put_contents($filepath, $string, LOCK_EX);
+        if ($filePath !== '') {
+            file_put_contents($filePath, $string, LOCK_EX);
         }
 
         return $string;
@@ -246,7 +246,7 @@ class Document
      *
      * @return string
      */
-    public function __get($name)
+    public function __get($name): string
     {
         switch ($name) {
             case 'outertext':
@@ -263,7 +263,7 @@ class Document
     /**
      * @return mixed
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->html();
     }
