@@ -21,21 +21,21 @@ class NodeList extends \ArrayObject
      */
     public function find($selector, $idx = null)
     {
-        $elements = new NodeList();
+        $elements = new self();
         foreach ($this as $node) {
             foreach ($node->find($selector) as $res) {
                 $elements->append($res);
             }
         }
-        if (is_null($idx)) {
+        if (null === $idx) {
             return $elements;
-        } else {
-            if ($idx < 0) {
-                $idx = count($elements) + $idx;
-            }
         }
 
-        return (isset($elements[$idx])) ? $elements[$idx] : null;
+        if ($idx < 0) {
+            $idx = count($elements) + $idx;
+        }
+
+        return isset($elements[$idx]) ? $elements[$idx] : null;
     }
 
     /**

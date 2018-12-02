@@ -10,6 +10,7 @@ use RuntimeException;
 
 /**
  * Class Element
+ *
  * @package FastSimpleHTMLDom
  * @property string      outertext Get dom node's outer html
  * @property string      innertext Get dom node's inner html
@@ -80,8 +81,8 @@ class Element implements \IteratorAggregate
 
         $newDocument = new Document($string);
 
-        if ($newDocument->outertext != $string) {
-            throw new RuntimeException("Not valid HTML fragment");
+        if ($newDocument->outertext !== $string) {
+            throw new RuntimeException('Not valid HTML fragment');
         }
 
         $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
@@ -106,8 +107,8 @@ class Element implements \IteratorAggregate
         if (!empty($string)) {
             $newDocument = new Document($string);
 
-            if ($newDocument->outertext != $string) {
-                throw new RuntimeException("Not valid HTML fragment");
+            if ($newDocument->outertext !== $string) {
+                throw new RuntimeException('Not valid HTML fragment');
             }
         }
 
@@ -160,7 +161,7 @@ class Element implements \IteratorAggregate
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int    $idx
+     * @param int $idx
      *
      * @return NodeList|Element|null
      */
@@ -477,7 +478,7 @@ class Element implements \IteratorAggregate
 
     /**
      * @param string $selector
-     * @param int    $idx
+     * @param int $idx
      *
      * @return Element|NodeList|null
      */
@@ -504,6 +505,7 @@ class Element implements \IteratorAggregate
 
     /**
      * Retrieve an external iterator
+     *
      * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
      * @return NodeList An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>

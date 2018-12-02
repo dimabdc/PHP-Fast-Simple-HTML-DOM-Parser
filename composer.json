@@ -14,6 +14,8 @@
 	"require":{
         "php":">=5.4",
         "ext-dom": "*",
+        "ext-libxml": "*",
+        "ext-simplexml": "*",
         "symfony/css-selector": "*"
     },
     "require-dev": {

@@ -58,9 +58,9 @@ class Document
         $this->document = new DOMDocument('1.0', 'UTF-8');
 
         if ($element instanceof Element) {
-            $element = $element->getNode();
+            $node = $element->getNode();
 
-            $domNode = $this->document->importNode($element, true);
+            $domNode = $this->document->importNode($node, true);
             $this->document->appendChild($domNode);
 
             return;
@@ -108,6 +108,9 @@ class Document
      * @param string $filePath
      *
      * @return Document
+     *
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function loadHtmlFile($filePath)
     {
@@ -162,15 +165,15 @@ class Document
             $elements[] = new Element($node);
         }
 
-        if (is_null($idx)) {
+        if (null === $idx) {
             return $elements;
-        } else {
-            if ($idx < 0) {
-                $idx = count($elements) + $idx;
-            }
         }
 
-        return (isset($elements[$idx])) ? $elements[$idx] : null;
+        if ($idx < 0) {
+            $idx = count($elements) + $idx;
+        }
+
+        return isset($elements[$idx]) ? $elements[$idx] : null;
     }
 
     /**
@@ -181,7 +184,7 @@ class Document
     public function html()
     {
         if ($this::$callback !== null) {
-            call_user_func_array($this::$callback, [$this]);
+            call_user_func($this::$callback, $this);
         }
 
         return trim($this->document->saveHTML($this->document->documentElement));
@@ -284,6 +287,8 @@ class Document
      * @param $arguments
      *
      * @return bool|mixed
+     *
+     * @throws BadMethodCallException
      */
     public function __call($name, $arguments)
     {
@@ -298,16 +303,18 @@ class Document
      * @param $arguments
      *
      * @return bool|Document
+     *
+     * @throws BadMethodCallException
      */
     public static function __callStatic($name, $arguments)
     {
-        if ($name == 'str_get_html') {
+        if ($name === 'str_get_html') {
             $document = new Document();
 
             return $document->loadHtml($arguments[0]);
         }
 
-        if ($name == 'file_get_html') {
+        if ($name === 'file_get_html') {
             $document = new Document();
 
             return $document->loadHtmlFile($arguments[0]);
