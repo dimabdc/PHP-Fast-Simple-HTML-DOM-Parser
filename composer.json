@@ -13,6 +13,7 @@
     ],
 	"require":{
         "php":">=5.4",
+        "ext-dom": "*",
         "symfony/css-selector": "*"
     },
     "require-dev": {

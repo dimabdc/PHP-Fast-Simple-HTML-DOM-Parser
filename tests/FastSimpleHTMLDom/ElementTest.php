@@ -67,6 +67,27 @@ class ElementTest extends TestCase
         $this->assertEquals('<div><h1>bar</h1></div>', $element->outertext);
     }
 
+    public function testReplaceText()
+    {
+        $html = '<div>foo</div>';
+        $replace = '<h1>bar</h1>';
+
+        $document = new Document($html);
+        $node = $document->getDocument()->documentElement;
+        $element = new Element($node);
+        $element->plaintext = $replace;
+
+        $this->assertEquals('&lt;h1&gt;bar&lt;/h1&gt;', $document->outertext);
+        $this->assertEquals($replace, $document->plaintext);
+        $this->assertEquals('&lt;h1&gt;bar&lt;/h1&gt;', $element->outertext);
+        $this->assertEquals($replace, $element->plaintext);
+
+        $element->plaintext = '';
+
+        $this->assertEquals('', $document->outertext);
+        $this->assertEquals('', $document->plaintext);
+    }
+
     public function testGetDom()
     {
         $html = '<div><p>foo</p></div>';

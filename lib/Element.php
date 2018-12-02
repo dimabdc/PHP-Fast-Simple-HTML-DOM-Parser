@@ -13,7 +13,7 @@ use RuntimeException;
  * @package FastSimpleHTMLDom
  * @property string      outertext Get dom node's outer html
  * @property string      innertext Get dom node's inner html
- * @property-read string plaintext Get dom node's plain text
+ * @property string      plaintext Get dom node's plain text
  * @property-read string tag       Get dom node name
  * @property-read string attr      Get dom node attributes
  *
@@ -67,6 +67,8 @@ class Element implements \IteratorAggregate
      * @param $string
      *
      * @return $this
+     *
+     * @throws RuntimeException
      */
     protected function replaceNode($string)
     {
@@ -96,6 +98,8 @@ class Element implements \IteratorAggregate
      * @param $string
      *
      * @return $this
+     *
+     * @throws RuntimeException
      */
     protected function replaceChild($string)
     {
@@ -115,6 +119,31 @@ class Element implements \IteratorAggregate
             $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
             $this->node->appendChild($newNode);
         }
+
+        return $this;
+    }
+
+    /**
+     * Replace this node with text
+     *
+     * @param $string
+     *
+     * @return $this
+     */
+    protected function replaceText($string)
+    {
+        if (empty($string)) {
+            $this->node->parentNode->removeChild($this->node);
+
+            return null;
+        }
+
+        $newElement = $this->node->ownerDocument->createTextNode($string);
+
+        $newNode = $this->node->ownerDocument->importNode($newElement, true);
+
+        $this->node->parentNode->replaceChild($newNode, $this->node);
+        $this->node = $newNode;
 
         return $this;
     }
@@ -408,6 +437,8 @@ class Element implements \IteratorAggregate
                 return $this->replaceNode($value);
             case 'innertext':
                 return $this->replaceChild($value);
+            case 'plaintext':
+                return $this->replaceText($value);
             default         :
                 return $this->setAttribute($name, $value);
         }
@@ -461,6 +492,7 @@ class Element implements \IteratorAggregate
      *
      * @return null|string|Element
      *
+     * @throws BadMethodCallException
      */
     public function __call($name, $arguments)
     {
