@@ -69,6 +69,29 @@ class NodeList extends \ArrayObject
     }
 
     /**
+     * @param string $string
+     *
+     * @return NodeList|Element[]
+     */
+    public static function fromString($string)
+    {
+        if (null === $string || trim($string) === '') {
+            return new self();
+        }
+
+        $string = "<body>$string</body>";
+
+        $newDocument = new Document($string);
+
+        $nodeList = new self();
+        foreach ($newDocument->getDocument()->documentElement->childNodes as $childNode) {
+            $nodeList->append(new Element($childNode));
+        }
+
+        return $nodeList;
+    }
+
+    /**
      * @param $name
      *
      * @return string

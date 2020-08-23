@@ -2,10 +2,11 @@
 
 namespace Tests\FastSimpleHTMLDom;
 
-
 use FastSimpleHTMLDom\Document;
 use FastSimpleHTMLDom\Element;
+use RuntimeException;
 use Tests\TestCase;
+use FastSimpleHTMLDom\NodeList;
 
 class ElementTest extends TestCase
 {
@@ -35,10 +36,14 @@ class ElementTest extends TestCase
         $this->assertInstanceOf('DOMNode', $element->getNode());
     }
 
-    public function testReplaceNode()
+    /**
+     * @dataProvider replaceNodeDataProvider
+     *
+     * @param string $replace
+     */
+    public function testReplaceNode($replace)
     {
         $html = '<div>foo</div>';
-        $replace = '<h1>bar</h1>';
 
         $document = new Document($html);
         $node = $document->getDocument()->documentElement;
@@ -47,10 +52,35 @@ class ElementTest extends TestCase
 
         $this->assertEquals($replace, $document->outertext);
         $this->assertEquals($replace, $element->outertext);
+    }
 
-        $element->outertext = '';
+    public function replaceNodeDataProvider()
+    {
+        return [
+            [
+                '<h1>bar</h1>',
+            ],
+            [
+                '',
+            ],
+            [
+                'foo',
+            ],
+        ];
+    }
 
-        $this->assertNotEquals($replace, $document->outertext);
+    public function testReplaceNodeManyRootNodesException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Not valid HTML fragment. String contains more one root node');
+
+        $html = '<div>foo</div>';
+        $replace = 'foo<h1>bar</h1>';
+
+        $document = new Document($html);
+        $node = $document->getDocument()->documentElement;
+        $element = new Element($node);
+        $element->outertext = $replace;
     }
 
     public function testReplaceChild()
@@ -96,11 +126,11 @@ class ElementTest extends TestCase
         $node = $document->getDocument()->documentElement;
         $element = new Element($node);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Document', $element->getDom());
+        $this->assertInstanceOf(Document::class, $element->getDom());
     }
 
     /**
-     * @dataProvider findTests
+     * @dataProvider findTestsDataProvider
      */
     public function testFind($html, $selector, $count)
     {
@@ -109,19 +139,19 @@ class ElementTest extends TestCase
 
         $elements = $element->find($selector);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
-        $this->assertEquals($count, count($elements));
+        $this->assertInstanceOf(NodeList::class, $elements);
+        $this->assertCount($count, $elements);
 
-        foreach ($elements as $node) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        foreach ($elements as $id => $node) {
+            $this->assertInstanceOf(Element::class, $node);
         }
 
         $elements = $element($selector);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
+        $this->assertInstanceOf(NodeList::class, $elements);
     }
 
-    public function findTests()
+    public function findTestsDataProvider()
     {
         $html = $this->loadFixture('testpage.html');
         return array(
@@ -135,7 +165,7 @@ class ElementTest extends TestCase
             array($html, 'input[id=in]', 1),
             array($html, '#in', 1),
             array($html, '*[id]', 52),
-            array($html, 'text', 462),
+            array($html, 'text', 234),
             array($html, 'comment', 3),
         );
     }
@@ -149,7 +179,7 @@ class ElementTest extends TestCase
 
         $node = $element->getElementById('in');
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertEquals('input', $node->tag);
         $this->assertEquals('number', $node->type);
         $this->assertEquals('5', $node->value);
@@ -164,7 +194,7 @@ class ElementTest extends TestCase
 
         $node = $element->getElementByTagName('div');
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertEquals('div', $node->tag);
         $this->assertEquals('top', $node->id);
         $this->assertEquals('page', $node->class);
@@ -179,11 +209,11 @@ class ElementTest extends TestCase
 
         $elements = $element->getElementsByTagName('div');
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
-        $this->assertEquals(16, count($elements));
+        $this->assertInstanceOf(NodeList::class, $elements);
+        $this->assertCount(16, $elements);
 
         foreach ($elements as $node) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+            $this->assertInstanceOf(Element::class, $node);
         }
     }
 
@@ -196,16 +226,16 @@ class ElementTest extends TestCase
 
         $nodes = $element->childNodes();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $nodes);
-        $this->assertEquals(2, count($nodes));
+        $this->assertInstanceOf(NodeList::class, $nodes);
+        $this->assertCount(2, $nodes);
 
         foreach ($nodes as $node) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+            $this->assertInstanceOf(Element::class, $node);
         }
 
         $node = $element->childNodes(1);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
 
         $this->assertEquals('<p>bar</p>', $node->outertext);
         $this->assertEquals('bar', $node->plaintext);
@@ -223,16 +253,16 @@ class ElementTest extends TestCase
 
         $nodes = $element->children();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $nodes);
-        $this->assertEquals(2, count($nodes));
+        $this->assertInstanceOf(NodeList::class, $nodes);
+        $this->assertCount(2, $nodes);
 
         foreach ($nodes as $node) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+            $this->assertInstanceOf(Element::class, $node);
         }
 
         $node = $element->children(1);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
 
         $this->assertEquals('<p>bar</p>', $node->outertext);
         $this->assertEquals('bar', $node->plaintext);
@@ -247,7 +277,7 @@ class ElementTest extends TestCase
 
         $node = $element->firstChild();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertEquals('<p>foo</p>', $node->outertext);
         $this->assertEquals('foo', $node->plaintext);
 
@@ -266,7 +296,7 @@ class ElementTest extends TestCase
 
         $node = $element->lastChild();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertEquals('<p>bar</p>', $node->outertext);
         $this->assertEquals('bar', $node->plaintext);
 
@@ -286,7 +316,7 @@ class ElementTest extends TestCase
         $node = $element->firstChild();
         $sibling = $node->nextSibling();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $sibling);
+        $this->assertInstanceOf(Element::class, $sibling);
         $this->assertEquals('<p>bar</p>', $sibling->outertext);
         $this->assertEquals('bar', $sibling->plaintext);
 
@@ -306,7 +336,7 @@ class ElementTest extends TestCase
         $node = $element->lastChild();
         $sibling = $node->previousSibling();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $sibling);
+        $this->assertInstanceOf(Element::class, $sibling);
         $this->assertEquals('<p>foo</p>', $sibling->outertext);
         $this->assertEquals('foo', $sibling->plaintext);
 
@@ -325,7 +355,7 @@ class ElementTest extends TestCase
 
         $node = $element->parentNode();
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertEquals('div', $node->tag);
         $this->assertEquals('div', $element->parent()->tag);
     }
@@ -414,6 +444,8 @@ class ElementTest extends TestCase
         $element = $document->find('div', 0);
 
         $this->assertTrue($element->hasAttribute('class'));
+        $this->assertInstanceOf(Element::class, $element);
+        /** @noinspection MissingIssetImplementationInspection */
         $this->assertTrue(isset($element->id));
     }
 }

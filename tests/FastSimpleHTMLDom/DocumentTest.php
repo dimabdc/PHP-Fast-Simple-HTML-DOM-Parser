@@ -8,6 +8,7 @@ use FastSimpleHTMLDom\Element;
 use InvalidArgumentException;
 use RuntimeException;
 use Tests\TestCase;
+use FastSimpleHTMLDom\NodeList;
 
 class DocumentTest extends TestCase
 {
@@ -102,9 +103,7 @@ class DocumentTest extends TestCase
         $html = '<div>foo</div>';
         $document = new Document($html);
 
-        $element = new Element($document->getDocument()->documentElement);
-
-        $this->assertEquals($html, $element->outertext);
+        $this->assertEquals($html, $document->outertext);
     }
 
     public function testLoadHtmlFile()
@@ -151,16 +150,16 @@ class DocumentTest extends TestCase
         $document = new Document($html);
         $elements = $document->find($selector);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
-        $this->assertEquals($count, count($elements));
+        $this->assertInstanceOf(NodeList::class, $elements);
+        $this->assertCount($count, $elements);
 
         foreach ($elements as $element) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $element);
+            $this->assertInstanceOf(Element::class, $element);
         }
 
         if ($count !== 0) {
             $element = $document->find($selector, -1);
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $element);
+            $this->assertInstanceOf(Element::class, $element);
         }
     }
 
@@ -179,7 +178,7 @@ class DocumentTest extends TestCase
             [$html, 'input[id=in]', 1],
             [$html, '#in', 1],
             [$html, '*[id]', 52],
-            [$html, 'text', 462],
+            [$html, 'text', 234],
             [$html, 'comment', 3],
         ];
     }

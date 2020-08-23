@@ -5,6 +5,8 @@ namespace Tests\FastSimpleHTMLDom;
 
 use FastSimpleHTMLDom\Document;
 use Tests\TestCase;
+use FastSimpleHTMLDom\NodeList;
+use FastSimpleHTMLDom\Element;
 
 class NodeListTest extends TestCase
 {
@@ -18,11 +20,11 @@ class NodeListTest extends TestCase
 
         $elements = $nodeList->find($selector);
 
-        $this->assertInstanceOf('FastSimpleHTMLDom\NodeList', $elements);
-        $this->assertEquals($count, count($elements));
+        $this->assertInstanceOf(NodeList::class, $elements);
+        $this->assertCount($count, $elements);
 
         foreach ($elements as $node) {
-            $this->assertInstanceOf('FastSimpleHTMLDom\Element', $node);
+            $this->assertInstanceOf(Element::class, $node);
         }
     }
 
@@ -40,7 +42,7 @@ class NodeListTest extends TestCase
             array($html, 'input[id=in]', 1),
             array($html, '#in', 1),
             array($html, '*[id]', 51),
-            array($html, 'text', 390),
+            array($html, 'text', 200),
         );
     }
 

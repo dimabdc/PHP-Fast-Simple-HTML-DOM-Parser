@@ -2,7 +2,6 @@
 
 namespace FastSimpleHTMLDom;
 
-
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class SelectorConverter

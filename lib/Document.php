@@ -2,7 +2,6 @@
 
 namespace FastSimpleHTMLDom;
 
-
 use BadMethodCallException;
 use DOMDocument;
 use DOMXPath;
@@ -85,18 +84,15 @@ class Document
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
         }
 
-        libxml_use_internal_errors(true);
-        libxml_disable_entity_loader(true);
+        $html = preg_replace('/>(?:[\t\s\n\r])+</', '><', $html);
 
-        $sxe = simplexml_load_string($html);
-        if (libxml_get_errors()) {
-            $this->document->loadHTML('<?xml encoding="UTF-8">' . $html);
-        } else {
-            $this->document = dom_import_simplexml($sxe)->ownerDocument;
+        libxml_use_internal_errors(true);
+
+        if (!$this->document->loadHTML($html, LIBXML_COMPACT|LIBXML_HTML_NOIMPLIED|LIBXML_HTML_NODEFDTD|LIBXML_NOENT|LIBXML_NOWARNING)) {
+            $this->document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_COMPACT|LIBXML_HTML_NOIMPLIED|LIBXML_HTML_NODEFDTD|LIBXML_NOENT|LIBXML_NOWARNING);
         }
 
         libxml_clear_errors();
-        libxml_disable_entity_loader(false);
         libxml_use_internal_errors(false);
 
         return $this;
@@ -187,7 +183,7 @@ class Document
             call_user_func($this::$callback, $this);
         }
 
-        return trim($this->document->saveHTML($this->document->documentElement));
+        return trim($this->document->saveHTML());
     }
 
     /**

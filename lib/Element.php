@@ -2,10 +2,10 @@
 
 namespace FastSimpleHTMLDom;
 
-
 use BadMethodCallException;
 use DOMElement;
 use DOMNode;
+use DOMText;
 use RuntimeException;
 
 /**
@@ -73,19 +73,19 @@ class Element implements \IteratorAggregate
      */
     protected function replaceNode($string)
     {
-        if (empty($string)) {
-            $this->node->parentNode->removeChild($this->node);
+        $importNodeList = NodeList::fromString($string);
 
+        if ($importNodeList->count() > 1) {
+            throw new RuntimeException('Not valid HTML fragment. String contains more one root node');
+        }
+
+        if ($importNodeList->count() === 0) {
+            $this->node->parentNode->removeChild($this->node);
+            $this->node = new DOMText();
             return null;
         }
 
-        $newDocument = new Document($string);
-
-        if ($newDocument->outertext !== $string) {
-            throw new RuntimeException('Not valid HTML fragment');
-        }
-
-        $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
+        $newNode = $this->node->ownerDocument->importNode($importNodeList[0]->getNode(), true);
 
         $this->node->parentNode->replaceChild($newNode, $this->node);
         $this->node = $newNode;
@@ -99,27 +99,21 @@ class Element implements \IteratorAggregate
      * @param $string
      *
      * @return $this
-     *
-     * @throws RuntimeException
      */
     protected function replaceChild($string)
     {
-        if (!empty($string)) {
-            $newDocument = new Document($string);
-
-            if ($newDocument->outertext !== $string) {
-                throw new RuntimeException('Not valid HTML fragment');
-            }
-        }
+        $importNodeList = NodeList::fromString($string);
 
         foreach ($this->node->childNodes as $node) {
             $this->node->removeChild($node);
         }
 
-        if (!empty($string)) {
-            $newNode = $this->node->ownerDocument->importNode($newDocument->getDocument()->documentElement, true);
+        foreach ($importNodeList as $importNode) {
+            $newNode = $this->node->ownerDocument->importNode($importNode->getNode(), true);
             $this->node->appendChild($newNode);
         }
+
+        $this->node->normalize();
 
         return $this;
     }
