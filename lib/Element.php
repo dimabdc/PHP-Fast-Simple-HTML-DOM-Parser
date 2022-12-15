@@ -505,6 +505,7 @@ class Element implements \IteratorAggregate
      * <b>Traversable</b>
      * @since 5.0.0
      */
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         $elements = new NodeList();
