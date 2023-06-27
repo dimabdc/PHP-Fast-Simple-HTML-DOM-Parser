@@ -41,7 +41,7 @@ class ElementTest extends TestCase
      *
      * @param string $replace
      */
-    static public function testReplaceNode($replace)
+    static public function testReplaceNode(string $replace)
     {
         $html = '<div>foo</div>';
 
@@ -54,7 +54,7 @@ class ElementTest extends TestCase
         static::assertEquals($replace, $element->outertext);
     }
 
-	public static function replaceNodeDataProvider()
+	public static function replaceNodeDataProvider(): array
 	{
 	    return [
 	        [
@@ -151,7 +151,7 @@ class ElementTest extends TestCase
         static::assertInstanceOf(NodeList::class, $elements);
     }
 
-	public static function findTestsDataProvider()
+	public static function findTestsDataProvider(): array
 	{
 	    $html = static::loadFixture('testpage.html');
 	    return array(

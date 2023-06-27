@@ -28,7 +28,7 @@ class NodeListTest extends TestCase
         }
     }
 
-	public static function findTests()
+	public static function findTests(): array
 	{
 	    $html = static::loadFixture('testpage.html');
 	    return array(

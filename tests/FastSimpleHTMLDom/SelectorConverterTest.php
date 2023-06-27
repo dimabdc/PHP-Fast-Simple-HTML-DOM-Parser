@@ -15,7 +15,7 @@ class SelectorConverterTest extends TestCase
         static::assertStringContainsString($needle, SelectorConverter::toXPath($cssSelector));
     }
 
-    static public function selectorsContainsDataProvider()
+    static public function selectorsContainsDataProvider(): array
     {
         return [
             [
