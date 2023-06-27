@@ -13,38 +13,38 @@ class NodeListTest extends TestCase
     /**
      * @dataProvider findTests
      */
-    public function testFind($html, $selector, $count)
+    static public function testFind($html, $selector, $count)
     {
         $document = new Document($html);
         $nodeList =$document->find('section');
 
         $elements = $nodeList->find($selector);
 
-        $this->assertInstanceOf(NodeList::class, $elements);
-        $this->assertCount($count, $elements);
+        static::assertInstanceOf(NodeList::class, $elements);
+        static::assertCount($count, $elements);
 
         foreach ($elements as $node) {
-            $this->assertInstanceOf(Element::class, $node);
+            static::assertInstanceOf(Element::class, $node);
         }
     }
 
-    public function findTests()
-    {
-        $html = $this->loadFixture('testpage.html');
-        return array(
-            array($html, '.fake h2', 0),
-            array($html, 'article', 16),
-            array($html, '.radio', 3),
-            array($html, 'input.radio', 3),
-            array($html, 'ul li', 9),
-            array($html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6),
-            array($html, 'input[id]', 23),
-            array($html, 'input[id=in]', 1),
-            array($html, '#in', 1),
-            array($html, '*[id]', 51),
-            array($html, 'text', 200),
-        );
-    }
+	public static function findTests()
+	{
+	    $html = static::loadFixture('testpage.html');
+	    return array(
+	        array($html, '.fake h2', 0),
+	        array($html, 'article', 16),
+	        array($html, '.radio', 3),
+	        array($html, 'input.radio', 3),
+	        array($html, 'ul li', 9),
+	        array($html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6),
+	        array($html, 'input[id]', 23),
+	        array($html, 'input[id=in]', 1),
+	        array($html, '#in', 1),
+	        array($html, '*[id]', 51),
+	        array($html, 'text', 200),
+	    );
+	}
 
     public function testInnerHtml()
     {

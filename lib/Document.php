@@ -118,15 +118,9 @@ class Document
             throw new RuntimeException("File $filePath not found");
         }
 
-        try {
-            $html = file_get_contents($filePath);
-        } catch (\Exception $e) {
-            throw new RuntimeException("Could not load file $filePath");
-        }
-
-        if ($html === false) {
-            throw new RuntimeException("Could not load file $filePath");
-        }
+				if (($html = @file_get_contents($filePath)) === false) {
+					throw new RuntimeException("Could not load file $filePath");
+				}
 
         $this->loadHtml($html);
 

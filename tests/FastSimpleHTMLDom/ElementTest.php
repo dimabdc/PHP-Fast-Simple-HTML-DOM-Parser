@@ -41,7 +41,7 @@ class ElementTest extends TestCase
      *
      * @param string $replace
      */
-    public function testReplaceNode($replace)
+    static public function testReplaceNode($replace)
     {
         $html = '<div>foo</div>';
 
@@ -50,24 +50,24 @@ class ElementTest extends TestCase
         $element = new Element($node);
         $element->outertext = $replace;
 
-        $this->assertEquals($replace, $document->outertext);
-        $this->assertEquals($replace, $element->outertext);
+        static::assertEquals($replace, $document->outertext);
+        static::assertEquals($replace, $element->outertext);
     }
 
-    public function replaceNodeDataProvider()
-    {
-        return [
-            [
-                '<h1>bar</h1>',
-            ],
-            [
-                '',
-            ],
-            [
-                'foo',
-            ],
-        ];
-    }
+	public static function replaceNodeDataProvider()
+	{
+	    return [
+	        [
+	            '<h1>bar</h1>',
+	        ],
+	        [
+	            '',
+	        ],
+	        [
+	            'foo',
+	        ],
+	    ];
+	}
 
     public function testReplaceNodeManyRootNodesException()
     {
@@ -132,43 +132,43 @@ class ElementTest extends TestCase
     /**
      * @dataProvider findTestsDataProvider
      */
-    public function testFind($html, $selector, $count)
+    static public function testFind($html, $selector, $count)
     {
         $document = new Document($html);
         $element = new Element($document->getDocument()->documentElement);
 
         $elements = $element->find($selector);
 
-        $this->assertInstanceOf(NodeList::class, $elements);
-        $this->assertCount($count, $elements);
+        static::assertInstanceOf(NodeList::class, $elements);
+        static::assertCount($count, $elements);
 
         foreach ($elements as $id => $node) {
-            $this->assertInstanceOf(Element::class, $node);
+            static::assertInstanceOf(Element::class, $node);
         }
 
         $elements = $element($selector);
 
-        $this->assertInstanceOf(NodeList::class, $elements);
+        static::assertInstanceOf(NodeList::class, $elements);
     }
 
-    public function findTestsDataProvider()
-    {
-        $html = $this->loadFixture('testpage.html');
-        return array(
-            array($html, '.fake h2', 0),
-            array($html, 'article', 16),
-            array($html, '.radio', 3),
-            array($html, 'input.radio', 3),
-            array($html, 'ul li', 35),
-            array($html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6),
-            array($html, 'input[id]', 23),
-            array($html, 'input[id=in]', 1),
-            array($html, '#in', 1),
-            array($html, '*[id]', 52),
-            array($html, 'text', 234),
-            array($html, 'comment', 3),
-        );
-    }
+	public static function findTestsDataProvider()
+	{
+	    $html = static::loadFixture('testpage.html');
+	    return array(
+	        array($html, '.fake h2', 0),
+	        array($html, 'article', 16),
+	        array($html, '.radio', 3),
+	        array($html, 'input.radio', 3),
+	        array($html, 'ul li', 35),
+	        array($html, 'fieldset#forms__checkbox li, fieldset#forms__radio li', 6),
+	        array($html, 'input[id]', 23),
+	        array($html, 'input[id=in]', 1),
+	        array($html, '#in', 1),
+	        array($html, '*[id]', 52),
+	        array($html, 'text', 234),
+	        array($html, 'comment', 3),
+	    );
+	}
 
     public function testGetElementById()
     {

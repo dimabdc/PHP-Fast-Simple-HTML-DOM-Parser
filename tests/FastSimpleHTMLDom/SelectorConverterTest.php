@@ -12,10 +12,10 @@ class SelectorConverterTest extends TestCase
      */
     public function testToXPath($cssSelector, $needle)
     {
-        $this->assertStringContainsString($needle, SelectorConverter::toXPath($cssSelector));
+        static::assertStringContainsString($needle, SelectorConverter::toXPath($cssSelector));
     }
 
-    public function selectorsContainsDataProvider()
+    static public function selectorsContainsDataProvider()
     {
         return [
             [
@@ -93,65 +93,65 @@ class SelectorConverterTest extends TestCase
         $this->assertStringNotContainsString($needle, SelectorConverter::toXPath($cssSelector));
     }
 
-    public function selectorsNotContainsDataProvider()
-    {
-        return [
-            [
-                '.text',
-                'text()',
-            ],
-            [
-                '#text',
-                'text()',
-            ],
-            [
-                'foo[text]',
-                'text()',
-            ],
-            [
-                'div[foo|text]',
-                'text()',
-            ],
-            [
-                'div[text|foo]',
-                'text()',
-            ],
-            [
-                'div[class*=text]',
-                'text()',
-            ],
-            [
-                'div[class*="text"]',
-                'text()',
-            ],
-            [
-                '.comment',
-                'comment()',
-            ],
-            [
-                '#comment',
-                'comment()',
-            ],
-            [
-                'foo[comment]',
-                'comment()',
-            ],
-            [
-                'div[foo|comment]',
-                'comment()',
-            ],
-            [
-                'div[comment|foo]',
-                'comment()',
-            ],
-            [
-                'div[class*=comment]',
-                'comment()',
-            ],
-            [
-                'div[class*="comment"]',
-                'comment()',
-            ],
-        ];
-    }
+	public static function selectorsNotContainsDataProvider(): array
+	{
+	    return [
+	        [
+	            '.text',
+	            'text()',
+	        ],
+	        [
+	            '#text',
+	            'text()',
+	        ],
+	        [
+	            'foo[text]',
+	            'text()',
+	        ],
+	        [
+	            'div[foo|text]',
+	            'text()',
+	        ],
+	        [
+	            'div[text|foo]',
+	            'text()',
+	        ],
+	        [
+	            'div[class*=text]',
+	            'text()',
+	        ],
+	        [
+	            'div[class*="text"]',
+	            'text()',
+	        ],
+	        [
+	            '.comment',
+	            'comment()',
+	        ],
+	        [
+	            '#comment',
+	            'comment()',
+	        ],
+	        [
+	            'foo[comment]',
+	            'comment()',
+	        ],
+	        [
+	            'div[foo|comment]',
+	            'comment()',
+	        ],
+	        [
+	            'div[comment|foo]',
+	            'comment()',
+	        ],
+	        [
+	            'div[class*=comment]',
+	            'comment()',
+	        ],
+	        [
+	            'div[class*="comment"]',
+	            'comment()',
+	        ],
+	    ];
+	}
 }

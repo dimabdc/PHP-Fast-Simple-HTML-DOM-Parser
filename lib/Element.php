@@ -505,7 +505,7 @@ class Element implements \IteratorAggregate
      * <b>Traversable</b>
      * @since 5.0.0
      */
-    public function getIterator()
+    public function getIterator(): NodeList
     {
         $elements = new NodeList();
         if ($this->node->hasChildNodes()) {
