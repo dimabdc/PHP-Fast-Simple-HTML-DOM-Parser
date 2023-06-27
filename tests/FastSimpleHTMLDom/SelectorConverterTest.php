@@ -12,7 +12,7 @@ class SelectorConverterTest extends TestCase
      */
     public function testToXPath($cssSelector, $needle)
     {
-        $this->assertContains($needle, SelectorConverter::toXPath($cssSelector));
+        $this->assertStringContainsString($needle, SelectorConverter::toXPath($cssSelector));
     }
 
     public function selectorsContainsDataProvider()
@@ -90,7 +90,7 @@ class SelectorConverterTest extends TestCase
      */
     public function testToXPathNotElements($cssSelector, $needle)
     {
-        $this->assertNotContains($needle, SelectorConverter::toXPath($cssSelector));
+        $this->assertStringNotContainsString($needle, SelectorConverter::toXPath($cssSelector));
     }
 
     public function selectorsNotContainsDataProvider()

@@ -13,82 +13,92 @@ use FastSimpleHTMLDom\NodeList;
 class DocumentTest extends TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectException InvalidArgumentException
      */
     public function testConstructWithInvalidArgument()
     {
-        new Document(['foo']);
+	      $this->expectException(InvalidArgumentException::class);
+	      new Document(['foo']);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectException InvalidArgumentException
      */
     public function testLoadHtmlWithInvalidArgument()
     {
+	      $this->expectException(InvalidArgumentException::class);
         $document = new Document();
-        $document->loadHtml(['foo']);
+	      $document->loadHtml(['foo']);
+
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectException InvalidArgumentException
      */
     public function testLoadWithInvalidArgument()
     {
+	      $this->expectException(InvalidArgumentException::class);
         $document = new Document();
-        $document->load(['foo']);
+	      $document->load(['foo']);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectException InvalidArgumentException
      */
     public function testLoadHtmlFileWithInvalidArgument()
     {
+	      $this->expectException(InvalidArgumentException::class);
         $document = new Document();
-        $document->loadHtmlFile(['foo']);
+	      $document->loadHtmlFile(['foo']);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectException InvalidArgumentException
      */
     public function testLoad_fileWithInvalidArgument()
     {
+	      $this->expectException(InvalidArgumentException::class);
         $document = new Document();
-        $document->load_file(['foo']);
+	      $document->load_file(['foo']);
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectException RuntimeException
      */
     public function testLoadHtmlFileWithNotExistingFile()
     {
+	      $this->expectException(RuntimeException::class);
         $document = new Document();
-        $document->loadHtmlFile('/path/to/file');
+	      $document->loadHtmlFile('/path/to/file');
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectException RuntimeException
      */
     public function testLoadHtmlFileWithNotLoadFile()
     {
+	      $this->expectException(RuntimeException::class);
         $document = new Document();
-        $document->loadHtmlFile('http://fobar');
+	      $document->loadHtmlFile('http://fobar');
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectException BadMethodCallException
      */
     public function testMethodNotExist()
     {
+	      $this->expectException(BadMethodCallException::class);
         $document = new Document();
-        $document->bar();
+				$document->bar();
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectException BadMethodCallException
      */
     public function testStaticMethodNotExist()
     {
-        Document::bar();
+	      $this->expectException(BadMethodCallException::class);
+				Document::bar();
     }
 
     public function testNotExistProperty()
