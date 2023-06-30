@@ -16,7 +16,7 @@
         "ext-dom": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
-        "symfony/css-selector": "*"
+        "symfony/css-selector": "^6.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0.0",
