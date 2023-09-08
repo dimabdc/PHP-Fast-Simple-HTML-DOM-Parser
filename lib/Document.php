@@ -29,12 +29,12 @@ class Document
     /**
      * @var DOMDocument
      */
-    protected $document;
+    protected DOMDocument $document;
 
     /**
      * @var array
      */
-    protected $functionAliases = [
+    protected array $functionAliases = [
         'outertext' => 'html',
         'innertext' => 'innerHtml',
         'load'      => 'loadHtml',
@@ -52,7 +52,7 @@ class Document
      *
      * @param string|Element $element HTML code or Element
      */
-    public function __construct($element = null)
+    public function __construct(mixed $element = null)
     {
         $this->document = new DOMDocument('1.0', 'UTF-8');
 
@@ -78,7 +78,7 @@ class Document
      * @return Document
      * @throws InvalidArgumentException if argument is not string
      */
-    public function loadHtml($html)
+    public function loadHtml(mixed $html): static
     {
         if (!is_string($html)) {
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
@@ -108,7 +108,7 @@ class Document
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function loadHtmlFile($filePath)
+    public function loadHtmlFile(mixed $filePath): static
     {
         if (!is_string($filePath)) {
             throw new InvalidArgumentException(__METHOD__ . ' expects parameter 1 to be string.');
@@ -118,15 +118,9 @@ class Document
             throw new RuntimeException("File $filePath not found");
         }
 
-        try {
-            $html = file_get_contents($filePath);
-        } catch (\Exception $e) {
-            throw new RuntimeException("Could not load file $filePath");
-        }
-
-        if ($html === false) {
-            throw new RuntimeException("Could not load file $filePath");
-        }
+				if (($html = @file_get_contents($filePath)) === false) {
+					throw new RuntimeException("Could not load file $filePath");
+				}
 
         $this->loadHtml($html);
 
@@ -136,7 +130,7 @@ class Document
     /**
      * @return DOMDocument
      */
-    public function getDocument()
+    public function getDocument(): DOMDocument
     {
         return $this->document;
     }
@@ -145,11 +139,11 @@ class Document
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int    $idx
+     * @param int|null $idx
      *
      * @return NodeList|Element|null
      */
-    public function find($selector, $idx = null)
+    public function find(mixed $selector, int $idx = null): NodeList|Element|null
     {
         $xPathQuery = SelectorConverter::toXPath($selector);
 
@@ -177,7 +171,7 @@ class Document
      *
      * @return string
      */
-    public function html()
+    public function html(): string
     {
         if ($this::$callback !== null) {
             call_user_func($this::$callback, $this);
@@ -191,7 +185,7 @@ class Document
      *
      * @return string
      */
-    public function innerHtml()
+    public function innerHtml(): string
     {
         $text = '';
         foreach ($this->document->documentElement->childNodes as $node) {
@@ -206,7 +200,7 @@ class Document
      *
      * @return string
      */
-    public function text()
+    public function text(): string
     {
         return $this->document->textContent;
     }
@@ -218,7 +212,7 @@ class Document
      *
      * @return string
      */
-    public function save($filepath = '')
+    public function save(string $filepath = ''): string
     {
         $string = $this->innerHtml();
         if ($filepath !== '') {
@@ -231,7 +225,7 @@ class Document
     /**
      * @param $functionName
      */
-    public function set_callback($functionName)
+    public function set_callback($functionName): void
     {
         $this::$callback = $functionName;
     }
@@ -247,20 +241,17 @@ class Document
      */
     public function __get($name)
     {
-        switch ($name) {
-            case 'outertext':
-                return $this->html();
-            case 'innertext':
-                return $this->innerHtml();
-            case 'plaintext':
-                return $this->text();
-        }
+	    return match ($name) {
+		    'outertext' => $this->html(),
+		    'innertext' => $this->innerHtml(),
+		    'plaintext' => $this->text(),
+		    default => null,
+	    };
 
-        return null;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function __toString()
     {
@@ -269,11 +260,11 @@ class Document
 
     /**
      * @param string $selector
-     * @param int    $idx
+     * @param int|null $idx
      *
      * @return Element|NodeList|null
      */
-    public function __invoke($selector, $idx = null)
+    public function __invoke(string $selector, int $idx = null): NodeList|Element|null
     {
         return $this->find($selector, $idx);
     }
@@ -298,7 +289,7 @@ class Document
      * @param $name
      * @param $arguments
      *
-     * @return bool|Document
+     * @return Document
      *
      * @throws BadMethodCallException
      */

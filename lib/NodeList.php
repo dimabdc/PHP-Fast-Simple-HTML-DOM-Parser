@@ -15,11 +15,11 @@ class NodeList extends \ArrayObject
      * Find list of nodes with a CSS selector
      *
      * @param string $selector
-     * @param int    $idx
+     * @param int|null $idx
      *
      * @return NodeList|Element|null
      */
-    public function find($selector, $idx = null)
+    public function find(string $selector, int $idx = null): NodeList|Element|null
     {
         $elements = new self();
         foreach ($this as $node) {
@@ -43,7 +43,7 @@ class NodeList extends \ArrayObject
      *
      * @return string
      */
-    public function text()
+    public function text(): string
     {
         $text = '';
         foreach ($this as $node) {
@@ -58,7 +58,7 @@ class NodeList extends \ArrayObject
      *
      * @return string
      */
-    public function innerHtml()
+    public function innerHtml(): string
     {
         $text = '';
         foreach ($this as $node) {
@@ -73,7 +73,7 @@ class NodeList extends \ArrayObject
      *
      * @return NodeList|Element[]
      */
-    public static function fromString($string)
+    public static function fromString(string $string): NodeList|array
     {
         if (null === $string || trim($string) === '') {
             return new self();
@@ -98,18 +98,16 @@ class NodeList extends \ArrayObject
      */
     public function __get($name)
     {
-        switch ($name) {
-            case 'innertext':
-                return $this->innerHtml();
-            case 'plaintext':
-                return $this->text();
-        }
+	    return match ($name) {
+		    'innertext' => $this->innerHtml(),
+		    'plaintext' => $this->text(),
+		    default => null,
+	    };
 
-        return null;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function __toString()
     {
@@ -118,11 +116,11 @@ class NodeList extends \ArrayObject
 
     /**
      * @param string $selector
-     * @param int    $idx
+     * @param int|null $idx
      *
      * @return Element|NodeList|null
      */
-    public function __invoke($selector, $idx = null)
+    public function __invoke(string $selector, int $idx = null): NodeList|Element|null
     {
         return $this->find($selector, $idx);
     }

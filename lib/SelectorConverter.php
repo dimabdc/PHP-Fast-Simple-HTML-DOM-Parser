@@ -2,26 +2,27 @@
 
 namespace FastSimpleHTMLDom;
 
+use RuntimeException;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class SelectorConverter
 {
-    protected static $compiled = [];
+    protected static array $compiled = [];
 
     /**
      * @param $selector
      *
      * @return mixed|string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    public static function toXPath($selector)
+    public static function toXPath($selector): mixed
     {
         if (isset(self::$compiled[$selector])){
             return self::$compiled[$selector];
         }
 
         if (!class_exists('Symfony\\Component\\CssSelector\\CssSelectorConverter')) {
-            throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector 2.8+ is not installed (you can use filterXPath instead).');
+            throw new RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector 2.8+ is not installed (you can use filterXPath instead).');
         }
 
         $converter = new CssSelectorConverter(true);

@@ -5,7 +5,7 @@ namespace Tests;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected function loadFixture($filename)
+    static protected function loadFixture($filename)
     {
         $path = __DIR__ . '/fixtures/' . $filename;
         if (file_exists($path)) {
